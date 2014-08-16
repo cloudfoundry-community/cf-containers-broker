@@ -1,0 +1,86 @@
+<div class='pvl panel'>
+  <div class='panel-body paxl'>
+    <h2 class='mnt'>Instance Details:</h2>
+    <div class='panel bkg-default-4 panel-shadow'>
+      <div class='panel-body'>
+        <p><strong>Service:</strong> <%= @service_name %></p>
+        <p><strong>Plan:</strong> <%= @plan_name %></p>
+        <p><strong>Instance GUID:</strong> <%= @instance_guid %></p>
+        <p><strong>Provider:</strong> <%= @instance_provider %></p>
+        <% if @instance_details && !@instance_details.empty? %>
+          <% @instance_details.each do |title, details| %>
+            <p><strong><%= title %>:</strong></p>
+            <ul class='list-notitle mbm'>
+              <% details.each do |key, value| %>
+                <li>
+                  <strong><%= key %>: </strong>
+                  <% if value.is_a?(Array) %>
+                    <ul>
+                    <% value.each do |v| %>
+                      <li><%= v %></li>
+                    <% end %>
+                    </ul>
+                  <% else %>
+                    <%= value %>
+                  <% end %>
+                  </li>
+              <% end %>
+            </ul>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @instance_processes && !@instance_processes.empty? %>
+    <h2 class='mnt'>Processes:</h2>
+    <div class='panel bkg-default-4 panel-shadow'>
+      <table class='table table-data'>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>PID</th>
+            <th>PPID</th>
+            <th>C</th>
+            <th>Start Time</th>
+            <th>Time</th>
+            <th>TTY</th>
+            <th>Command</th>
+        </tr >
+        </thead>
+        <tbody>
+        <% @instance_processes.each do |process| %>
+          <tr>
+            <td><%= process['UID'] %></td>
+            <td><%= process['PID'] %></td>
+            <td><%= process['PPID'] %></td>
+            <td><%= process['C'] %></td>
+            <td><%= process['STIME'] %></td>
+            <td><%= process['TTY'] %></td>
+            <td><%= process['TIME'] %></td>
+            <td><%= process['CMD'] %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% end %>
+
+    <% if @instance_stdout && !@instance_stdout.empty? %>
+    <h2 class='mnt'>stdout:</h2>
+    <div class='panel bkg-default-4 panel-shadow'>
+      <div class='panel-body'>
+        <pre><%= @instance_stdout %></pre>
+      </div>
+    </div>
+    <% end %>
+
+    <% if @instance_stderr && !@instance_stderr.empty? %>
+    <h2 class='mnt'>stderr:</h2>
+    <div class='panel bkg-default-4 panel-shadow'>
+      <div class='panel-body'>
+        <pre><%= @instance_stderr %></pre>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</div>

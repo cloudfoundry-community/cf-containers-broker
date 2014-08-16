@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <% if @dashboard_name %>
+        <title><%= @dashboard_name %></title>
+      <% else %>
+        <title>Container Management Dashboard</title>
+      <% end %>
+      <%= favicon_link_tag %>
+      <%= stylesheet_link_tag 'application', media: 'all' %>
+    </head>
+    <body>
+      <div class='container-gmajor'>
+        <div class='main-wrapper no-sidebar-main-wrapper'>
+          <div class='row header pvl mhn'>
+            <div class='teal-text col-xs-16 phn pvn'>
+              CloudFoundry Services
+            </div>
+            <div class='col-xs-8 phn pvn text-right'>
+            <% if Configuration.documentation_url %>
+                <%= link_to 'Docs', Configuration.documentation_url, class: 'mlxl' %>
+            <% end %>
+            <% if Configuration.support_url %>
+                <%= link_to 'Support', Configuration.support_url, class: 'mlxl' %>
+            <% end %>
+            </div>
+          </div>
+
+          <div class='services-container'>
+            <div class='header-container pvm'>
+              <% if @dashboard_image %>
+                <%= image_tag(@dashboard_image.html_safe, height: '64', width: '64') %>
+              <% else %>
+                <%= image_tag 'icon-container.png' %>
+              <% end %>
+              <span class='phm'>
+                <% if @dashboard_name %>
+                  <strong><%= @dashboard_name %></strong>
+                <% else %>
+                  <strong>Container Management Dashboard</strong>
+                <% end %>
+              </span>
+            </div>
+
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    </body>
+</html>

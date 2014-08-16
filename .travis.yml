@@ -1,0 +1,12 @@
+language: ruby
+
+branches:
+  only:
+    - master
+
+rvm:
+  - 2.0.0
+
+bundler_args: --deployment --without development
+
+script: bundle exec rspec spec

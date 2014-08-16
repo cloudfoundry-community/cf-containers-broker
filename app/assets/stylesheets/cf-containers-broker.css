@@ -1,0 +1,49 @@
+.no-sidebar-main-wrapper {
+    margin: 0 20px;
+    left: 0;
+    right: 0;
+    width: auto;
+}
+
+.header {
+    background-color: #243640;
+}
+
+.float-right {
+    float: right;
+}
+
+.services-container {
+    padding: 0 15px;
+}
+
+.header-container {
+    color: #243640;
+    font-size: 18px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.teal-text {
+    color: #00a79d;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+    font-size: 13px;
+}
+
+.panel-text {
+    font-size: 16px;
+}
+
+.panel-message {
+    max-width: 600px;
+    background-color: #f6f6f6;
+    border: none;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.07);
+    min-height: 88px;
+    -moz-background-clip: padding;
+    /* Firefox 3.6 */
+    -webkit-background-clip: padding;
+    /* Safari 4? Chrome 6? */
+    background-clip: padding-box;
+    /* Firefox 4, Safari 5, Opera 10, IE 9 */
+}
