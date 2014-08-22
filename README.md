@@ -48,7 +48,7 @@ bundle
 bundle exec rackup
 ```
 
-The service broker will listen by default at port 9292: [http://localhost:9292](http://localhost:9292).
+The service broker will listen by default at port 9292. View the catalog API at [http://localhost:9292/v2/catalog](http://localhost:9292v2/catalog). The basic auth username is `containers` and secret is `secret`.
 
 #### As a Docker container
 
