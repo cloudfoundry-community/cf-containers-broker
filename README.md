@@ -114,6 +114,15 @@ This service broker can be deployed alongside:
 
 Add the service broker to Cloud Foundry as described by [the service broker documentation](http://docs.cloudfoundry.org/services/managing-service-brokers.html).
 
+A quick way to register the service broker and to enable all service offerings is running:
+
+```
+cf create-service-broker docker-broker containers containers http://cf-containers-broker.<YOUR CF SYSTEM DOMAIN>
+for p in $(cf service-access | tail -n +3 | sed 's/^ *//' | cut -f1 -d' ' | sort | uniq); do
+	cf enable-service-access $p
+done
+```
+
 ### Tests
 
 To run all specs:
