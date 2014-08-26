@@ -397,14 +397,14 @@ describe DockerManager do
             'PublishAllPorts' => false,
             'Privileged' => true,
             'RestartPolicy' => {
-                'Name' => restart,
+              'Name' => restart,
             },
             'CapAdd' => ['NET_ADMIN'],
             'CapDrop' => ['CHOWN'],
         }
       }
 
-      it 'should not ' do
+      it 'should not add it at the start options' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)
