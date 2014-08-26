@@ -9,8 +9,9 @@ class DockerManager < ContainerManager
 
   MIN_SUPPORTED_DOCKER_API_VERSION = '1.13'
 
-  attr_reader :image, :tag, :command, :entrypoint, :workdir, :environment, :expose_ports,
-              :persistent_volumes, :user, :memory, :memory_swap, :cpu_shares, :privileged
+  attr_reader :image, :tag, :command, :entrypoint, :restart, :workdir, :environment, :expose_ports,
+              :persistent_volumes, :user, :memory, :memory_swap, :cpu_shares, :privileged,
+              :cap_adds, :cap_drops
 
   def initialize(attrs)
     super
@@ -21,6 +22,7 @@ class DockerManager < ContainerManager
     @tag = attrs.fetch('tag', 'latest') || 'latest'
     @command = attrs.fetch('command', '')
     @entrypoint = attrs.fetch('entrypoint', nil)
+    @restart = attrs.fetch('restart', 'always') || 'always'
     @workdir = attrs.fetch('workdir', nil)
     @environment = attrs.fetch('environment', []).compact || []
     @expose_ports = attrs.fetch('expose_ports', []).compact || []
@@ -30,6 +32,8 @@ class DockerManager < ContainerManager
     @memory_swap = attrs.fetch('memory_swap', 0) || 0
     @cpu_shares = attrs.fetch('cpu_shares', nil)
     @privileged = attrs.fetch('privileged', false)
+    @cap_adds = attrs.fetch('cap_adds', []) || []
+    @cap_drops = attrs.fetch('cap_drops', []) || []
   end
 
   def find(guid)
@@ -318,6 +322,9 @@ class DockerManager < ContainerManager
       'PortBindings' => port_bindings(guid),
       'PublishAllPorts' => false,
       'Privileged' => privileged,
+      'RestartPolicy' => restart_policy,
+      'CapAdd' => cap_adds,
+      'CapDrop' => cap_drops,
     }
   end
 
@@ -361,6 +368,15 @@ class DockerManager < ContainerManager
       ports[cp] = hp.first['HostPort'] unless hp.nil? || hp.empty?
     end
     ports
+  end
+
+  def restart_policy
+    restart_args = restart.split(':')
+
+    policy = { 'Name' => restart_args[0] }
+    policy['MaximumRetryCount'] = restart_args[1].to_i if restart_args.size > 1
+
+    policy
   end
 
   def host_uri

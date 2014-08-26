@@ -13,6 +13,7 @@ describe DockerManager do
       'command' => 'command1 command2',
       'entrypoint' => ['/bin/bash'],
       'workdir' => 'my-wordkdir',
+      'restart' => restart,
       'environment' => ['USER=MY-USER'],
       'expose_ports' => [expose_port],
       'persistent_volumes' => [persistent_volume],
@@ -21,6 +22,8 @@ describe DockerManager do
       'memory_swap' => '256m',
       'cpu_shares' => 0.1,
       'privileged' => true,
+      'cap_adds' => ['NET_ADMIN'],
+      'cap_drops' => ['CHOWN'],
       'credentials' => {
         'username' => {
           'key' => username_key,
@@ -54,6 +57,7 @@ describe DockerManager do
   let(:expose_port) { '1234/tcp' }
   let(:container_expose_port) { '5678/tcp' }
   let(:persistent_volume) { '/data' }
+  let(:restart) { 'on-failure:5' }
   let(:api_version) { DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION }
 
   before do
@@ -71,6 +75,7 @@ describe DockerManager do
       expect(subject.command).to eq('command1 command2')
       expect(subject.entrypoint).to eq(['/bin/bash'])
       expect(subject.workdir).to eq('my-wordkdir')
+      expect(subject.restart).to eq(restart)
       expect(subject.environment).to eq(['USER=MY-USER'])
       expect(subject.expose_ports).to eq(['1234/tcp'])
       expect(subject.persistent_volumes).to eq(['/data'])
@@ -79,6 +84,8 @@ describe DockerManager do
       expect(subject.memory_swap).to eq('256m')
       expect(subject.cpu_shares).to eq(0.1)
       expect(subject.privileged).to be_truthy
+      expect(subject.cap_adds).to eq(['NET_ADMIN'])
+      expect(subject.cap_drops).to eq(['CHOWN'])
       expect(subject.credentials).to eq(credentials)
       expect(subject.syslog_drain_port).to eq('512/udp')
     end
@@ -99,7 +106,7 @@ describe DockerManager do
         }
       end
 
-      it 'sets the tag field to nil' do
+      it 'sets the tag field to latest' do
         expect(subject.tag).to eql('latest')
       end
 
@@ -113,6 +120,10 @@ describe DockerManager do
 
       it 'sets the workdir field to nil' do
         expect(subject.workdir).to be_nil
+      end
+
+      it 'sets the restart field to always' do
+        expect(subject.restart).to eq('always')
       end
 
       it 'sets the environment field to an empty array' do
@@ -145,6 +156,14 @@ describe DockerManager do
 
       it 'sets the privileged field to false' do
         expect(subject.privileged).to be_falsey
+      end
+
+      it 'sets the cap_adds field to an empty array' do
+        expect(subject.cap_adds).to eq([])
+      end
+
+      it 'sets the cap_drops field to an empty array' do
+        expect(subject.cap_drops).to eq([])
       end
 
       it 'sets the credentials field to a Credentials object' do
@@ -265,6 +284,12 @@ describe DockerManager do
         'PortBindings' => port_bindings,
         'PublishAllPorts' => false,
         'Privileged' => true,
+        'RestartPolicy' => {
+          'Name' => 'on-failure',
+          'MaximumRetryCount' => 5,
+        },
+        'CapAdd' => ['NET_ADMIN'],
+        'CapDrop' => ['CHOWN'],
       }
     }
     let(:env_vars) { ['USER=MY-USER'] }
@@ -357,6 +382,30 @@ describe DockerManager do
         expect(Settings).to receive(:host_directory).and_return('/tmp')
         expect(FileUtils).to receive(:mkdir_p).with("/tmp/#{container_name}#{persistent_volume}")
         expect(FileUtils).to receive(:chmod_R).with(0777, "/tmp/#{container_name}#{persistent_volume}")
+        expect(container).to receive(:start).with(container_start_opts)
+        expect(container).to receive(:json).and_return(container_state)
+        subject.create(guid)
+      end
+    end
+
+    context 'when restart policy does not include a retry count' do
+      let(:restart) { 'no' }
+      let(:container_start_opts) {
+        {
+            'Binds' => binds,
+            'PortBindings' => port_bindings,
+            'PublishAllPorts' => false,
+            'Privileged' => true,
+            'RestartPolicy' => {
+                'Name' => restart,
+            },
+            'CapAdd' => ['NET_ADMIN'],
+            'CapDrop' => ['CHOWN'],
+        }
+      }
+
+      it 'should not ' do
+        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)
         subject.create(guid)

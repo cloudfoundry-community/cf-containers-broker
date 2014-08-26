@@ -97,6 +97,12 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
     <td>Working directory inside the container.</td>
   </tr>
   <tr>
+    <td>container.restart</td>
+    <td>N</td>
+    <td>String</td>
+    <td>Restart policy to apply when a container exits (no, on-failure, always). If not set, it will use `always` by default.</td>
+  </tr>
+  <tr>
     <td>container.environment[]</td>
     <td>N</td>
     <td>Array of Strings</td>
@@ -146,6 +152,18 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
     <td>N</td>
     <td>Boolean</td>
     <td>Enable/disable extended privileges for this container.</td>
+  </tr>
+  <tr>
+    <td>container.cap_adds[]</td>
+    <td>N</td>
+    <td>Array of Strings</td>
+    <td>Linux capabilities to add</td>
+  </tr>
+  <tr>
+    <td>container.cap_drops[]</td>
+    <td>N</td>
+    <td>Array of Strings</td>
+    <td>Linux capabilities to drop</td>
   </tr>
 </table>
 
