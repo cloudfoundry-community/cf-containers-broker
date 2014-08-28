@@ -59,9 +59,8 @@ class Credentials
     service_credentials = { 'hostname' => hostname }
 
     service_credentials['ports'] = ports
-    if ports.size > 1
-    else
-      service_credentials['port'] = ports.values[0] unless ports.empty?
+    if ports.size == 1
+      service_credentials['port'] = ports.values[0]
     end
 
     service_credentials['username'] = username_value(guid) if username_key
