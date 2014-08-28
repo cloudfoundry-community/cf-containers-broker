@@ -101,14 +101,7 @@ class DockerManager < ContainerManager
     Rails.logger.info("Building credentials hash for container `#{container_name(guid)}'...")
     if container = find(guid)
       ports = bound_ports(container)
-      if credentials.uri_port
-        if port = ports.fetch(credentials.uri_port, nil)
-          ports = { credentials.uri_port => port }
-        else
-          Rails.logger.info("+-> Credentials #{credentials.uri_port} is not exposed")
-          ports = {}
-        end
-      end
+      Rails.logger.info("+-> Ports exposed for container `#{container_name(guid)}': #{ports.inspect}")
 
       service_credentials = credentials.to_hash(guid, host_uri, ports)
       Rails.logger.info("+-> Credentials: " + service_credentials.inspect)
