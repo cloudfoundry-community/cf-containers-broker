@@ -21,3 +21,6 @@
 vendor/bundle/
 vendor/cache/
 public/assets/
+
+# Ignore developer's settings files
+config/settings.*.yml
