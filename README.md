@@ -123,6 +123,20 @@ for p in $(cf service-access | tail -n +3 | sed 's/^ *//' | cut -f1 -d' ' | sort
 done
 ```
 
+### Bindings
+
+The way that each service is configured determines how binding credentials are generated.
+
+A service that exposes only a single port, and has no other credentials configuration will include the minimal host and port in its credentials:
+
+```json
+{ "host": "10.11.12.13", "port": 61234, "ports": ["8080/tcp": 61234] }
+```
+
+In the example above, the container exposed an internal port `8080`. It was bound to port `61234` on the host machine, `10.11.12.13`.
+
+For more, see the CREDENTIALS.md file.
+
 ### Tests
 
 To run all specs:

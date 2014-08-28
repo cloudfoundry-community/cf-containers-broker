@@ -166,6 +166,7 @@ describe Credentials do
     it 'contains the correct values' do
       expect(credentials_hash.fetch('hostname')).to eq(hostname)
       expect(credentials_hash.fetch('port')).to eq(host_port)
+      expect(credentials_hash.fetch('ports')).to eq(ports)
       expect(credentials_hash.fetch('username')).to eq(username_value)
       expect(credentials_hash.fetch('password')).to eq(password_value)
       expect(credentials_hash.fetch('dbname')).to eq(dbname_value)
@@ -176,9 +177,9 @@ describe Credentials do
       let(:ports) { {} }
       let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
 
-      it 'does not return port/s field' do
+      it 'does not return port field' do
         expect(credentials_hash).to_not include('port')
-        expect(credentials_hash).to_not include('ports')
+        expect(credentials_hash).to include('ports')
       end
 
       it 'uri does not contain port' do
@@ -200,7 +201,7 @@ describe Credentials do
         expect(credentials_hash).to_not include('port')
       end
 
-      it 'uri does not contain port' do
+      it 'uri does not contains port' do
         expect(credentials_hash.fetch('uri')).to eq(uri)
       end
     end

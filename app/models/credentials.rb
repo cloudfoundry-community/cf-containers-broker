@@ -58,10 +58,9 @@ class Credentials
   def to_hash(guid, hostname, ports)
     service_credentials = { 'hostname' => hostname }
 
-    if ports.size > 1
-      service_credentials['ports'] = ports
-    else
-      service_credentials['port'] = ports.values[0] unless ports.empty?
+    service_credentials['ports'] = ports
+    if ports.size == 1
+      service_credentials['port'] = ports.values[0]
     end
 
     service_credentials['username'] = username_value(guid) if username_key
