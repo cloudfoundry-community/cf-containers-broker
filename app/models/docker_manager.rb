@@ -144,7 +144,7 @@ class DockerManager < ContainerManager
         'ID' => container_json['Id'],
         'Name' => container_json['Name'],
         'Image' => container_json['Config']['Image'],
-        'Entrypoint' => container_json['Config']['Entrypoint'].join(' '),
+        'Entrypoint' => (container_json['Config']['Entrypoint'] || []).join(' '),
         'Command' => container_json['Config']['Cmd'].join(' '),
         'Work Directory' => container_json['Config']['WorkingDir'],
         'Environment Variables' => container_json['Config']['Env'],
