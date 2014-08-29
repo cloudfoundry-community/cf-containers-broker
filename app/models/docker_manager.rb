@@ -114,7 +114,7 @@ class DockerManager < ContainerManager
       Rails.logger.info("+-> Credentials: " + service_credentials.inspect)
       service_credentials
     else
-      raise "Docker Container `#{container_name(guid)}' not found"
+      raise Exceptions::NotFound, "Docker Container `#{container_name(guid)}' not found"
     end
   end
 
@@ -132,7 +132,7 @@ class DockerManager < ContainerManager
       end
       url
     else
-      raise "Docker Container `#{container_name(guid)}' not found"
+      raise Exceptions::NotFound, "Docker Container `#{container_name(guid)}' not found"
     end
   end
 
@@ -173,7 +173,7 @@ class DockerManager < ContainerManager
       Rails.logger.info("+-> details: #{details.inspect}")
       { 'Container Info' => details }
     else
-      raise "Docker Container `#{container_name(guid)}' not found"
+      raise Exceptions::NotFound, "Docker Container `#{container_name(guid)}' not found"
     end
   end
 
