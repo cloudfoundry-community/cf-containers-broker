@@ -140,33 +140,38 @@ class DockerManager < ContainerManager
     Rails.logger.info("Building details hash for container `#{container_name(guid)}'...")
     if container = find(guid)
       container_json = container.json
+      container_config = container_json.fetch('Config', {})
+      container_state = container_json.fetch('State', {})
+      container_hostconfig = container_json.fetch('HostConfig', {})
+      container_network_settings = container_json.fetch('NetworkSettings', {})
+
       details = {
         'ID' => container_json['Id'],
         'Name' => container_json['Name'],
-        'Image' => container_json['Config']['Image'],
-        'Entrypoint' => (container_json['Config']['Entrypoint'] || []).join(' '),
-        'Command' => container_json['Config']['Cmd'].join(' '),
-        'Work Directory' => container_json['Config']['WorkingDir'],
-        'Environment Variables' => container_json['Config']['Env'],
-        'CPU Shares' => container_json['Config']['CpuShares'],
-        'Memory' => container_json['Config']['Memory'],
-        'Memory Swap' => container_json['Config']['MemorySwap'],
-        'User' => container_json['Config']['User'],
+        'Image' => container_config['Image'],
+        'Entrypoint' => container_config.fetch('Entrypoint', []).join(' '),
+        'Command' => container_config.fetch('Cmd', []).join(' '),
+        'Work Directory' => container_config['WorkingDir'],
+        'Environment Variables' => container_config['Env'],
+        'CPU Shares' => container_config['CpuShares'],
+        'Memory' => container_config['Memory'],
+        'Memory Swap' => container_config['MemorySwap'],
+        'User' => container_config['User'],
         'Created' => "#{time_ago_in_words(Time.parse(container_json['Created']))} ago",
       }
 
       if container_running?(container)
-        paused = container_json['State']['Paused'] ? ' (Paused)' : ''
-        details['Status'] = "Up for #{time_ago_in_words(Time.parse(container_json['State']['StartedAt']))}" + paused
-        details['Privileged'] = container_json['HostConfig']['Privileged']
-        details['IP Address'] = container_json['NetworkSettings']['IPAddress']
+        paused = container_state['Paused'] ? ' (Paused)' : ''
+        details['Status'] = "Up for #{time_ago_in_words(Time.parse(container_state['StartedAt']))}" + paused
+        details['Privileged'] = container_hostconfig['Privileged']
+        details['IP Address'] = container_network_settings['IPAddress']
         details['Exposed Ports'] = bound_ports(container).map { |cb, hp| "#{cb} -> #{hp}" }
-        details['Exposed Volumes'] = container_json.fetch('HostConfig', {}).fetch('Binds', [])
+        details['Exposed Volumes'] = container_hostconfig.fetch('Binds', [])
       else
-        if container_json['State']['ExitCode'] == 0
+        if container_state['ExitCode'] == 0
           details['Status'] = 'Stopped'
         else
-          details['Status'] = "Exited (#{container_json['State']['ExitCode']}) #{time_ago_in_words(Time.parse(container_json['State']['FinishedAt']))} ago"
+          details['Status'] = "Exited (#{container_state['ExitCode']}) #{time_ago_in_words(Time.parse(container_state['FinishedAt']))} ago"
         end
       end
 
