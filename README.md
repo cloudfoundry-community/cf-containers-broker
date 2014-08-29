@@ -127,15 +127,25 @@ done
 
 The way that each service is configured determines how binding credentials are generated.
 
-A service that exposes only a single port, and has no other credentials configuration will include the minimal host and port in its credentials:
+A service that exposes only a single port and has no other credentials configuration will include the minimal host and port in its credentials:
 
 ```json
 { "host": "10.11.12.13", "port": 61234, "ports": ["8080/tcp": 61234] }
 ```
 
-In the example above, the container exposed an internal port `8080`. It was bound to port `61234` on the host machine, `10.11.12.13`.
+In the example above, the container exposed an internal port `8080` and it was bound to port `61234` on the host machine `10.11.12.13`.
 
-For more, see the CREDENTIALS.md file.
+If a service exposes more than a single port, then you must specify the port you want to bind using the `credentials.uri.port` property,
+otherwise the binding will not contain a port.
+
+```json
+{ "host": "10.11.12.13", "port": 61234, "ports": ["8080/tcp": 61234, "8081/tcp": 61235] }
+```
+
+In the example above, the container exposed internal ports `8080` and `8081`, and it was bound to port `61234` on the
+host machine `10.11.12.13` because the `credentials.uri.port` property was set to `8080/tcp`.
+
+For more details, see the [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md) file.
 
 ### Tests
 
