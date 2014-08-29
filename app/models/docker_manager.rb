@@ -155,7 +155,7 @@ class DockerManager < ContainerManager
         'Created' => "#{time_ago_in_words(Time.parse(container_json['Created']))} ago",
       }
 
-      if container_json['State']['Running']
+      if container_running?(container)
         paused = container_json['State']['Paused'] ? ' (Paused)' : ''
         details['Status'] = "Up for #{time_ago_in_words(Time.parse(container_json['State']['StartedAt']))}" + paused
         details['Privileged'] = container_json['HostConfig']['Privileged']
@@ -180,7 +180,7 @@ class DockerManager < ContainerManager
   def processes(guid)
     Rails.logger.info("Retrieving processes for Docker container `#{container_name(guid)}'...")
     if container = find(guid)
-      return [] unless container.json['State']['Running']
+      return [] unless container_running?(container)
       container.top
     else
       raise Exceptions::NotFound, "Docker container `#{container_name(guid)}' not found"
