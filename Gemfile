@@ -19,6 +19,7 @@ end
 
 group :development do
   gem 'guard-rails'
+  gem 'shotgun'
 end
 
 group :test do
