@@ -58,8 +58,14 @@ class Credentials
   def to_hash(guid, hostname, ports)
     service_credentials = { 'hostname' => hostname }
 
-    service_credentials['ports'] = ports
-    if ports.size == 1
+    service_credentials['ports'] = ports unless ports.empty?
+    if uri_port
+      if port = ports.fetch(uri_port, nil)
+        service_credentials['port'] = port
+      else
+        Rails.logger.info("+-> Credentials #{uri_port} is not exposed")
+      end
+    elsif ports.size == 1
       service_credentials['port'] = ports.values[0]
     end
 

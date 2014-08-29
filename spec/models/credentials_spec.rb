@@ -173,36 +173,149 @@ describe Credentials do
       expect(credentials_hash.fetch('uri')).to eq(uri)
     end
 
-    context 'when there is no port' do
-      let(:ports) { {} }
-      let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+    context 'when uri.port is set' do
+      let(:uri_port) { '1234/tcp' }
 
-      it 'does not return port field' do
-        expect(credentials_hash).to_not include('port')
-        expect(credentials_hash).to include('ports')
+      context 'and there is no exposed ports' do
+        let(:ports) { {} }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+
+        it 'should not return ports field' do
+          expect(credentials_hash).to_not include('ports')
+        end
+
+        it 'should not return port field' do
+          expect(credentials_hash).to_not include('port')
+        end
+
+        it 'uri should not contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
       end
 
-      it 'uri does not contain port' do
-        expect(credentials_hash.fetch('uri')).to eq(uri)
+      context 'and there is only one exposed port' do
+        let(:ports) { { '1234/tcp' => host_port } }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}:#{host_port}/#{dbname_value}" }
+
+        it 'should return ports field' do
+          expect(credentials_hash.fetch('ports')).to eq(ports)
+        end
+
+        it 'should return port field' do
+          expect(credentials_hash.fetch('port')).to eq(host_port)
+        end
+
+        it 'uri should not contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
+
+        context 'but is not the same as uri.port' do
+          let(:uri_port) { '9012/tcp' }
+          let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+
+          it 'should not return port field' do
+            expect(credentials_hash).to_not include('port')
+          end
+
+          it 'uri should not contain a port' do
+            expect(credentials_hash.fetch('uri')).to eq(uri)
+          end
+        end
+      end
+
+      context 'and there is more than one exposed port' do
+        let(:ports) {
+          {
+            '1234/tcp' => host_port,
+            '5678/tcp' => '99999',
+          }
+        }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}:#{host_port}/#{dbname_value}" }
+
+        it 'should return ports field' do
+          expect(credentials_hash.fetch('ports')).to eq(ports)
+        end
+
+        it 'should return port field' do
+          expect(credentials_hash.fetch('port')).to eq(host_port)
+        end
+
+        it 'uri should contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
+
+        context 'but none matches uri.port' do
+          let(:uri_port) { '9012/tcp' }
+          let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+
+          it 'should not return port field' do
+            expect(credentials_hash).to_not include('port')
+          end
+
+          it 'uri should not contain a port' do
+            expect(credentials_hash.fetch('uri')).to eq(uri)
+          end
+        end
       end
     end
 
-    context 'when it has more than one port' do
-      let(:ports) {
-        {
-          '1234/tcp' => host_port,
-          '5678/tcp' => host_port,
-        }
-      }
-      let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+    context 'when uri.port is not set' do
+      let(:uri_port) { nil }
 
-      it 'returns ports instead of port' do
-        expect(credentials_hash.fetch('ports')).to eq(ports)
-        expect(credentials_hash).to_not include('port')
+      context 'and there is no exposed ports' do
+        let(:ports) { {} }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+
+        it 'should not return ports field' do
+          expect(credentials_hash).to_not include('ports')
+        end
+
+        it 'should not return port field' do
+          expect(credentials_hash).to_not include('port')
+        end
+
+        it 'uri should not contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
       end
 
-      it 'uri does not contains port' do
-        expect(credentials_hash.fetch('uri')).to eq(uri)
+      context 'and there is only one exposed port' do
+        let(:ports) { { '1234/tcp' => host_port } }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}:#{host_port}/#{dbname_value}" }
+
+        it 'should return ports field' do
+          expect(credentials_hash.fetch('ports')).to eq(ports)
+        end
+
+        it 'should return port field' do
+          expect(credentials_hash.fetch('port')).to eq(host_port)
+        end
+
+        it 'uri should contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
+      end
+
+      context 'and there is more than one exposed port' do
+        let(:ports) {
+          {
+            '1234/tcp' => host_port,
+            '5678/tcp' => '99999',
+          }
+        }
+        let(:uri) { "#{uri_prefix}://#{username_value}:#{password_value}@#{hostname}/#{dbname_value}" }
+
+        it 'should return ports field' do
+          expect(credentials_hash.fetch('ports')).to eq(ports)
+        end
+
+        it 'should not return port field' do
+          expect(credentials_hash).to_not include('port')
+        end
+
+        it 'uri should not contain a port' do
+          expect(credentials_hash.fetch('uri')).to eq(uri)
+        end
       end
     end
 
