@@ -123,6 +123,9 @@ for p in $(cf service-access | tail -n +3 | sed 's/^ *//' | cut -f1 -d' ' | sort
 done
 ```
 
+Note that the route to your service broker is registered after all images have been downloaded, and this happens before the broker is started, so depending on the number of images to fetch from the registry, the broker can take a long time to be started and registered.
+The route can be configured using the `external_host` property (see [SETTINGS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md) for more details).
+
 ### Bindings
 
 The way that each service is configured determines how binding credentials are generated.
