@@ -100,7 +100,11 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
     <td>container.restart</td>
     <td>N</td>
     <td>String</td>
-    <td>Restart policy to apply when a container exits (no, on-failure, always). If not set, it will use `always` by default.</td>
+    <td>Restart policy to apply when a container exits (no, on-failure, always). If not set,
+    it will use `always` by default. The restart policy will apply also in case the VM hosting the container is
+    killed and CF/BOSH resurrects it. Might happen that the new VM gets a new IP address, and probably the containers
+    will use a new random port. In order to make any application bound to a container work again,
+    the user must unbind/bind the application to the service again in order to pick the new IP/port.</td>
   </tr>
   <tr>
     <td>container.environment[]</td>
