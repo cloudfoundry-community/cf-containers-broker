@@ -3,13 +3,14 @@
 class ContainerManager
   CONTAINER_PREFIX = 'cf'.freeze
 
-  attr_reader :backend, :credentials, :syslog_drain_port
+  attr_reader :backend, :credentials, :syslog_drain_port, :syslog_drain_protocol
 
   def initialize(attrs)
     validate_attrs(attrs)
-    @backend           = attrs.fetch('backend')
-    @credentials       = Credentials.new(attrs.fetch('credentials', {}))
-    @syslog_drain_port = attrs.fetch('syslog_drain_port', nil)
+    @backend               = attrs.fetch('backend')
+    @credentials           = Credentials.new(attrs.fetch('credentials', {}))
+    @syslog_drain_port     = attrs.fetch('syslog_drain_port', nil)
+    @syslog_drain_protocol = attrs.fetch('syslog_drain_protocol', 'syslog')
   end
 
   def find(guid)

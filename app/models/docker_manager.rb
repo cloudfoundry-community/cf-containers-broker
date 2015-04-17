@@ -114,7 +114,7 @@ class DockerManager < ContainerManager
     if container = find(guid)
       Rails.logger.info("Building syslog_drain_url for container `#{container_name(guid)}'...")
       if port = bound_ports(container).fetch(syslog_drain_port, nil)
-        url = "http://#{host_uri}:#{port}"
+        url = "#{syslog_drain_protocol}://#{host_uri}:#{port}"
         Rails.logger.info("+-> syslog_drain_url: #{url}")
       else
         url = nil

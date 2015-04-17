@@ -38,7 +38,8 @@ describe DockerManager do
             'value' => dbname_value,
         },
       },
-      'syslog_drain_port' => '512/udp',
+      'syslog_drain_port' => syslog_drain_port,
+      'syslog_drain_protocol' => syslog_drain_protocol,
     }
   end
   let(:guid) { 'guid' }
@@ -56,6 +57,8 @@ describe DockerManager do
                              dbname_key: dbname_key) }
   let(:expose_port) { '1234/tcp' }
   let(:container_expose_port) { '5678/tcp' }
+  let(:syslog_drain_port) { '512/udp' }
+  let(:syslog_drain_protocol) { 'syslog-tls' }
   let(:persistent_volume) { '/data' }
   let(:restart) { 'on-failure:5' }
   let(:api_version) { DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION }
@@ -87,7 +90,8 @@ describe DockerManager do
       expect(subject.cap_adds).to eq(['NET_ADMIN'])
       expect(subject.cap_drops).to eq(['CHOWN'])
       expect(subject.credentials).to eq(credentials)
-      expect(subject.syslog_drain_port).to eq('512/udp')
+      expect(subject.syslog_drain_port).to eq(syslog_drain_port)
+      expect(subject.syslog_drain_protocol).to eq(syslog_drain_protocol)
     end
 
     context 'when mandatory keys are missing' do
@@ -172,6 +176,10 @@ describe DockerManager do
 
       it 'sets the syslog_drain_port field to nil' do
         expect(subject.syslog_drain_port).to be_nil
+      end
+
+      it 'sets the syslog_drain_protocol field to syslog' do
+        expect(subject.syslog_drain_protocol).to eq('syslog')
       end
     end
 
@@ -469,7 +477,45 @@ describe DockerManager do
   end
 
   describe '#syslog_drain_url' do
-    # TODO
+    let(:exposed_host_port) { '2345' }
+    let(:container_state) {
+      {
+        'NetworkSettings' => { 'Ports' => { syslog_drain_port => [{'HostPort' => exposed_host_port}] }},
+      }
+    }
+
+    it 'should return the syslog drain url' do
+      expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+      expect(container).to receive(:json).and_return(container_state)
+      expect(subject.syslog_drain_url(guid)).to eq("#{syslog_drain_protocol}://127.0.0.1:#{exposed_host_port}")
+    end
+
+    context 'when the syslog drain port is not exposed' do
+      let(:exposed_host_port) { nil }
+
+      it 'should not return the syslog drain url' do
+        expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+        expect(container).to receive(:json).and_return(container_state)
+        expect(subject.syslog_drain_url(guid)).to be_nil
+      end
+    end
+
+    context 'when there is no syslog drain port' do
+      let(:syslog_drain_port) { nil }
+
+      it 'should not return the syslog drain url' do
+        expect(subject.syslog_drain_url(guid)).to be_nil
+      end
+    end
+
+    context 'when the container does not exists' do
+      it 'should raise an Exception' do
+        expect(Docker::Container).to receive(:get).with(container_name).and_raise(Docker::Error::NotFoundError)
+        expect do
+          subject.processes(guid)
+        end.to raise_error(Exceptions::NotFound, "Docker container `#{container_name}' not found")
+      end
+    end
   end
 
   describe '#details' do

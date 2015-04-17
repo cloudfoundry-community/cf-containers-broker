@@ -11,6 +11,7 @@ describe ContainerManager do
         'username' => 'my-username',
       },
       'syslog_drain_port' => '514/udp',
+      'syslog_drain_protocol' => 'syslog-tls',
     }
   }
   let(:guid) { 'guid' }
@@ -25,6 +26,7 @@ describe ContainerManager do
       expect(subject.backend).to eq('my_backend')
       expect(subject.credentials).to eq(credentials)
       expect(subject.syslog_drain_port).to eq('514/udp')
+      expect(subject.syslog_drain_protocol).to eq('syslog-tls')
     end
 
     context 'when mandatory keys are missing' do
@@ -50,6 +52,10 @@ describe ContainerManager do
 
       it 'sets the syslog_drain_port field to nil' do
         expect(subject.syslog_drain_port).to be_nil
+      end
+
+      it 'sets the syslog_drain_protocol field to syslog' do
+        expect(subject.syslog_drain_protocol).to eq('syslog')
       end
     end
   end

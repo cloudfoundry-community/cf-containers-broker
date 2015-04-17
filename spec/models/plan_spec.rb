@@ -19,6 +19,7 @@ describe Plan do
         'username' => 'my-username',
       },
       'syslog_drain_port' => '514/udp',
+      'syslog_drain_protocol' => 'syslog-tls',
       'container'         => {
         'backend' => 'docker',
       },
@@ -39,6 +40,7 @@ describe Plan do
       expect(plan.max_containers).to eq(5)
       expect(plan.credentials).to eq({ 'username' => 'my-username' })
       expect(plan.syslog_drain_port).to eq('514/udp')
+      expect(plan.syslog_drain_protocol).to eq('syslog-tls')
       expect(plan.container_manager).to eq(docker_manager)
     end
 
@@ -95,6 +97,10 @@ describe Plan do
 
       it 'sets the syslog_drain_port field to nil' do
         expect(plan.syslog_drain_port).to be_nil
+      end
+
+      it 'sets the syslog_drain_protocol field to syslog' do
+        expect(plan.syslog_drain_protocol).to eq('syslog')
       end
     end
   end

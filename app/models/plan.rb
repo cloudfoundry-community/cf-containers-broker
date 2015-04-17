@@ -5,7 +5,7 @@ require Rails.root.join('app/models/credentials')
 
 class Plan
   attr_reader :id, :name, :description, :metadata, :free, :max_containers, :credentials,
-              :syslog_drain_port, :container_manager
+              :syslog_drain_port, :syslog_drain_protocol, :container_manager
 
   def self.build(attrs)
     new(attrs)
@@ -14,14 +14,15 @@ class Plan
   def initialize(attrs)
     validate_attrs(attrs)
 
-    @id                = attrs.fetch('id')
-    @name              = attrs.fetch('name')
-    @description       = attrs.fetch('description')
-    @metadata          = attrs.fetch('metadata', nil)
-    @free              = attrs.fetch('free', true)
-    @max_containers    = attrs.fetch('max_containers', nil)
-    @credentials       = attrs.fetch('credentials', {})
-    @syslog_drain_port = attrs.fetch('syslog_drain_port', nil)
+    @id                    = attrs.fetch('id')
+    @name                  = attrs.fetch('name')
+    @description           = attrs.fetch('description')
+    @metadata              = attrs.fetch('metadata', nil)
+    @free                  = attrs.fetch('free', true)
+    @max_containers        = attrs.fetch('max_containers', nil)
+    @credentials           = attrs.fetch('credentials', {})
+    @syslog_drain_port     = attrs.fetch('syslog_drain_port', nil)
+    @syslog_drain_protocol = attrs.fetch('syslog_drain_protocol', 'syslog')
     @container_manager = build_container_manager(attrs.fetch('container'))
   end
 
@@ -59,7 +60,9 @@ class Plan
       raise Exceptions::NotSupported, "Could not load Container Manager for backend `#{container_backend}'"
     end
 
-    container_attrs = attrs.merge('credentials' => credentials, 'syslog_drain_port' => syslog_drain_port)
+    container_attrs = attrs.merge('credentials' => credentials,
+                                  'syslog_drain_port' => syslog_drain_port,
+                                  'syslog_drain_protocol' => syslog_drain_protocol)
     Class.const_get("#{container_backend.capitalize}Manager").new(container_attrs)
   end
 end
