@@ -233,6 +233,14 @@ describe DockerManager do
     end
   end
 
+  describe '#allocate_host_port (private)' do
+    it 'should allocate consecutive ports' do
+      expect(subject.send(:allocate_host_port)).to eq(10000)
+      expect(subject.send(:allocate_host_port)).to eq(10001)
+      expect(subject.send(:allocate_host_port)).to eq(10002)
+    end
+  end
+
   describe '#can_allocate?' do
     context 'when the number of existing containers does not exceed max_containers' do
       it 'should return true' do
@@ -302,13 +310,13 @@ describe DockerManager do
     }
     let(:env_vars) { ['USER=MY-USER'] }
     let(:binds) { [] }
-    let(:port_bindings) { { expose_port => [{}] } }
+    let(:port_bindings) { { expose_port => [{'HostPort' => '10000'}] } }
     let(:persistent_volume) { nil }
     let(:container_running) { true }
     let(:container_state) {
       {
         'State' => { 'Running' => container_running },
-        'Config' => { 'ExposedPorts' => { container_expose_port => {} }},
+        'Config' => { 'ExposedPorts' => { container_expose_port => [{'HostPort' => '10000'}] }},
       }
     }
 
