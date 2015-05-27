@@ -49,6 +49,11 @@ class HostPortAllocator
   end
 
   def port_available?(port)
-    true
+    port_open?(port)
+  end
+
+  # http://stackoverflow.com/a/22752150/36170
+  def port_open?(port)
+    !system("lsof -i:#{port}", out: '/dev/null')
   end
 end
