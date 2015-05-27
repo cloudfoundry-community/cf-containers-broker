@@ -363,7 +363,6 @@ class DockerManager < ContainerManager
       image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
       Hash[image_expose_ports.map { |ep, _| [ep, [{}]] }]
     else
-      # Hash[expose_ports.map { |ep| [ep, [{}]] }]
       Hash[expose_ports.map { |ep| [ep, [{'HostPort' => allocate_host_port.to_s}]] }]
     end
   end

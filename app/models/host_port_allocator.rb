@@ -1,3 +1,7 @@
+# HostPortAllocator allows a server to allocate ports for containers
+# It uses a local /var/vcap/store/cf-containers-broker/host_port_counter
+# file to store the last port allocated. It uses lsof to confirm that a port
+# to be allocated is not currently being used.
 class HostPortAllocator
   attr_reader :counter_path
 
