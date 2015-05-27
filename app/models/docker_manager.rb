@@ -361,7 +361,7 @@ class DockerManager < ContainerManager
     if expose_ports.empty?
       container = find(guid)
       image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
-      Hash[image_expose_ports.map { |ep, _| [ep, [{}]] }]
+      Hash[image_expose_ports.map { |ep, _| [ep, [{'HostPort' => allocate_host_port.to_s}]] }]
     else
       Hash[expose_ports.map { |ep| [ep, [{'HostPort' => allocate_host_port.to_s}]] }]
     end

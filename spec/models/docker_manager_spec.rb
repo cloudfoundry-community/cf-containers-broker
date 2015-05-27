@@ -372,7 +372,7 @@ describe DockerManager do
 
     context 'when there are no exposed ports' do
       let(:expose_port) { nil }
-      let(:port_bindings) { { container_expose_port => [{}] } }
+      let(:port_bindings) { { container_expose_port => [{'HostPort' => '10000'}] } }
 
       it 'should expose the container image exposed ports' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
