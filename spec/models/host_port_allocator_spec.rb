@@ -13,4 +13,12 @@ describe HostPortAllocator do
     expect(subject.send(:allocate_next_port)).to eq(10004)
     expect(subject.send(:allocate_next_port)).to eq(10000)
   end
+
+  it 'should raise NoAvailablePort if cannot find a port' do
+    expect(subject).to receive(:port_available?).and_return(false).at_least(:once)
+    expect(subject).to receive(:timeout_seconds).and_return(0.1).twice
+    expect {
+      subject.send(:allocate_next_port)
+    }.to raise_error(HostPortAllocator::NoAvailablePort)
+  end
 end

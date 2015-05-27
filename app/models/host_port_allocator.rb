@@ -2,6 +2,7 @@ class HostPortAllocator
   attr_reader :counter_path
 
   class LockTimeout < StandardError; end
+  class NoAvailablePort < StandardError; end
 
   def initialize(base_dir, counter_start, counter_end)
     @base_dir = base_dir
@@ -13,15 +14,13 @@ class HostPortAllocator
     port = nil
     File.open(counter_path, File::RDWR|File::CREAT, 0644) do |f|
       # TODO perhaps assume that if lock isn't released then recreate and restart counter
-      Timeout::timeout(1, LockTimeout) { f.flock(File::LOCK_EX) }
-      previous_port = f.read.to_i
-      if previous_port < @counter_start
-        port = @counter_start
-      else
-        port = previous_port + 1
-      end
-      if port > @counter_end
-        port = @counter_start
+      Timeout::timeout(timeout_seconds, LockTimeout) { f.flock(File::LOCK_EX) }
+      Timeout::timeout(timeout_seconds, NoAvailablePort) do
+        previous_port = f.read.to_i
+        port = next_available_port(previous_port)
+        until port_available?(port)
+          port = next_available_port(port)
+        end
       end
       f.rewind
       f.write("#{port}\n")
@@ -30,5 +29,26 @@ class HostPortAllocator
       f.flock(File::LOCK_UN)
     end
     port
+  end
+
+  def timeout_seconds
+    2
+  end
+
+  private
+  def next_available_port(previous_port)
+    if previous_port < @counter_start
+      port = @counter_start
+    else
+      port = previous_port + 1
+    end
+    if port > @counter_end
+      port = @counter_start
+    end
+    port
+  end
+
+  def port_available?(port)
+    true
   end
 end
