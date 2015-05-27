@@ -62,6 +62,7 @@ describe DockerManager do
   let(:persistent_volume) { '/data' }
   let(:restart) { 'on-failure:5' }
   let(:api_version) { DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION }
+  let(:allocated_host_port) { 10000 }
 
   before do
     allow(Docker).to receive(:version).and_return({ 'ApiVersion' => api_version })
@@ -69,6 +70,7 @@ describe DockerManager do
     allow(credentials).to receive(:username_value).with(guid).and_return(username_value)
     allow(credentials).to receive(:password_value).with(guid).and_return(password_value)
     allow(credentials).to receive(:dbname_value).with(guid).and_return(dbname_value)
+    expect(subject).to receive(:allocate_host_port).and_return(10000).at_most(:once)
   end
 
   describe '#initialize' do
@@ -230,14 +232,6 @@ describe DockerManager do
           subject.find(guid)
         end.to raise_error(Docker::Error::IOError)
       end
-    end
-  end
-
-  describe '#allocate_host_port (private)' do
-    it 'should allocate consecutive ports' do
-      expect(subject.send(:allocate_host_port)).to eq(10000)
-      expect(subject.send(:allocate_host_port)).to eq(10001)
-      expect(subject.send(:allocate_host_port)).to eq(10002)
     end
   end
 
