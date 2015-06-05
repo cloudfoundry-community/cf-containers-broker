@@ -217,6 +217,11 @@ class DockerManager < ContainerManager
 
   def validate_docker_remote_api
     api_version = Docker.version.fetch('ApiVersion', '0')
+    # Swarm returns API version with wrong key APIVersion instead of ApiVersion, so until
+    # https://github.com/docker/swarm/issues/687 is solved and released, work around this
+    if api_version == '0'
+      api_version = Docker.version.fetch('APIVersion', '0')
+    end
     unless api_version >= MIN_SUPPORTED_DOCKER_API_VERSION
       raise Exceptions::BackendError, "Docker Remote API version `#{api_version}' not supported"
     end
