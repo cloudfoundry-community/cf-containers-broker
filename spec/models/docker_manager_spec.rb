@@ -477,17 +477,31 @@ describe DockerManager do
   end
 
   describe '#syslog_drain_url' do
+    let(:settings_host_ip) { '1.2.3.4' }
     let(:exposed_host_port) { '2345' }
+    let(:exposed_host_ip) { '0.0.0.0' }
     let(:container_state) {
       {
-        'NetworkSettings' => { 'Ports' => { syslog_drain_port => [{'HostPort' => exposed_host_port}] }},
+        'NetworkSettings' => { 'Ports' => { syslog_drain_port => [{'HostIp' => exposed_host_ip, 'HostPort' => exposed_host_port}] }},
       }
     }
 
     it 'should return the syslog drain url' do
       expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
       expect(container).to receive(:json).and_return(container_state)
-      expect(subject.syslog_drain_url(guid)).to eq("#{syslog_drain_protocol}://127.0.0.1:#{exposed_host_port}")
+      expect(Settings).to receive(:external_ip).and_return('1.2.3.4')
+      expect(subject.syslog_drain_url(guid)).to eq("#{syslog_drain_protocol}://#{settings_host_ip}:#{exposed_host_port}")
+    end
+
+    context 'when the syslog drain port is not exposed' do
+      let(:exposed_host_ip) { '1.2.3.4' }
+
+      it 'should return the syslog drain url with the correct host ip' do
+        expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+        expect(container).to receive(:json).and_return(container_state)
+        expect(Settings).to_not receive(:external_ip)
+        expect(subject.syslog_drain_url(guid)).to eq("#{syslog_drain_protocol}://#{exposed_host_ip}:#{exposed_host_port}")
+      end
     end
 
     context 'when the syslog drain port is not exposed' do
