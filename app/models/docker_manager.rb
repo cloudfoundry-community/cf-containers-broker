@@ -11,7 +11,7 @@ class DockerManager < ContainerManager
 
   attr_reader :image, :tag, :command, :entrypoint, :restart, :workdir, :environment, :expose_ports,
               :persistent_volumes, :user, :memory, :memory_swap, :cpu_shares, :privileged,
-              :cap_adds, :cap_drops
+              :cap_adds, :cap_drops, :host_uri
 
   def initialize(attrs)
     super
@@ -34,6 +34,7 @@ class DockerManager < ContainerManager
     @privileged = attrs.fetch('privileged', false)
     @cap_adds = attrs.fetch('cap_adds', []) || []
     @cap_drops = attrs.fetch('cap_drops', []) || []
+    @host_uri = Settings.external_ip
   end
 
   def find(guid)
@@ -100,7 +101,8 @@ class DockerManager < ContainerManager
   def service_credentials(guid)
     Rails.logger.info("Building credentials hash for container `#{container_name(guid)}'...")
     if container = find(guid)
-      service_credentials = credentials.to_hash(guid, host_uri, bound_ports(container))
+      info = bound_ports(container)
+      service_credentials = credentials.to_hash(guid, info['host_ip'], info['ports'])
       Rails.logger.info("+-> Credentials: " + service_credentials.inspect)
       service_credentials
     else
@@ -113,7 +115,7 @@ class DockerManager < ContainerManager
 
     if container = find(guid)
       Rails.logger.info("Building syslog_drain_url for container `#{container_name(guid)}'...")
-      if port = bound_ports(container).fetch(syslog_drain_port, nil)
+      if port = bound_ports(container)['ports'].fetch(syslog_drain_port, nil)
         url = "#{syslog_drain_protocol}://#{host_uri}:#{port}"
         Rails.logger.info("+-> syslog_drain_url: #{url}")
       else
@@ -155,7 +157,7 @@ class DockerManager < ContainerManager
         details['Status'] = "Up for #{time_ago_in_words(Time.parse(container_state['StartedAt']))}" + paused
         details['Privileged'] = container_hostconfig['Privileged']
         details['IP Address'] = container_network_settings['IPAddress']
-        details['Exposed Ports'] = bound_ports(container).map { |cb, hp| "#{cb} -> #{hp}" }
+        details['Exposed Ports'] = bound_ports(container)['ports'].map { |cb, hp| "#{cb} -> #{hp}" }
         details['Exposed Volumes'] = container_hostconfig.fetch('Binds', [])
       else
         if container_state['ExitCode'] == 0
@@ -358,11 +360,18 @@ class DockerManager < ContainerManager
   end
 
   def bound_ports(container)
-    ports = {}
+    info = {}
+    info['ports'] = {}
     container.json.fetch('NetworkSettings', {}).fetch('Ports', {}).each do |cp, hp|
-      ports[cp] = hp.first['HostPort'] unless hp.nil? || hp.empty?
+      # assuming convention that for container broker containers there will be only port mappings through the container host IP address
+      info['host_ip'] = hp.first['HostIp'] unless hp.nil? || hp.empty? # last one wins
+      info['ports'][cp] = hp.first['HostPort'] unless hp.nil? || hp.empty?
     end
-    ports
+    # if we talk to a plain docker daemon (no swarm manager) we will see 0.0.0.0 as IP address and should use the docker daemon IP address for the client to connect
+    if info['host_ip'] == '0.0.0.0'
+      info['host_ip'] = Settings.external_ip
+    end
+    info
   end
 
   def restart_policy
@@ -372,9 +381,5 @@ class DockerManager < ContainerManager
     policy['MaximumRetryCount'] = restart_args[1].to_i if restart_args.size > 1
 
     policy
-  end
-
-  def host_uri
-    Settings.external_ip
   end
 end
