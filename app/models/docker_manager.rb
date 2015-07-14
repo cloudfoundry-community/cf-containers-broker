@@ -239,14 +239,11 @@ class DockerManager < ContainerManager
     {
       'name' => container_name(guid),
       'Hostname' => '',
+      'Domainname' => '',
       'User' => user,
-      'Memory' => convert_memory(memory),
-      'MemorySwap' => convert_memory(memory_swap),
-      'CpuShares' => cpu_shares,
       'AttachStdin' => false,
       'AttachStdout' => true,
       'AttachStderr' => true,
-      'PortSpecs' => nil,
       'Tty' => false,
       'OpenStdin' => false,
       'StdinOnce' => false,
@@ -254,9 +251,18 @@ class DockerManager < ContainerManager
       'Cmd' => command.split(' '),
       'Entrypoint' => entrypoint,
       'Image' => "#{image.strip}:#{tag.strip}",
+      'Labels' => {},
       'Volumes' => {},
       'WorkingDir' => workdir,
-      'DisableNetwork' => false,
+      'NetworkDisabled' => false,
+      'ExposedPorts' => {},
+      'HostConfig' => {
+        'Memory' => convert_memory(memory),
+        'MemorySwap' => convert_memory(memory_swap),
+        'CpuShares' => cpu_shares,
+        'PublishAllPorts' => false,
+        'Privileged' => privileged,
+      },
     }
   end
 
@@ -321,12 +327,21 @@ class DockerManager < ContainerManager
   def start_options(guid)
     {
       'Binds' => volume_bindings(guid),
+      'Links' => [],
+      'LxcConf' => {},
+      'Memory' => convert_memory(memory),
+      'MemorySwap' => convert_memory(memory_swap),
+      'CpuShares' => cpu_shares,
       'PortBindings' => port_bindings(guid),
       'PublishAllPorts' => false,
       'Privileged' => privileged,
-      'RestartPolicy' => restart_policy,
+      'ReadonlyRootfs' => false,
+      'VolumesFrom' => [],
       'CapAdd' => cap_adds,
       'CapDrop' => cap_drops,
+      'RestartPolicy' => restart_policy,
+      'Devices' => [],
+      'Ulimits' => [],
     }
   end
 
