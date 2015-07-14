@@ -266,14 +266,11 @@ describe DockerManager do
       {
         'name' => container_name,
         'Hostname' => '',
+        'Domainname' => '',
         'User' => 'my-user',
-        'Memory' => 512 * 1024 * 1024,
-        'MemorySwap' => 256 * 1024 * 1024,
-        'CpuShares' => 0.1,
         'AttachStdin' => false,
         'AttachStdout' => true,
         'AttachStderr' => true,
-        'PortSpecs' => nil,
         'Tty' => false,
         'OpenStdin' => false,
         'StdinOnce' => false,
@@ -281,23 +278,41 @@ describe DockerManager do
         'Cmd' => ['command1', 'command2'],
         'Entrypoint' => ['/bin/bash'],
         'Image' => 'my-image:latest',
+        'Labels' => {},
         'Volumes' => {},
         'WorkingDir' => 'my-wordkdir',
-        'DisableNetwork' => false,
+        'NetworkDisabled' => false,
+        'ExposedPorts' => {},
+        'HostConfig' => {
+          'Memory' => 512 * 1024 * 1024,
+          'MemorySwap' => 256 * 1024 * 1024,
+          'CpuShares' => 0.1,
+          'PublishAllPorts' => false,
+          'Privileged' => true,
+        },
       }
     }
     let(:container_start_opts) {
       {
         'Binds' => binds,
+        'Links' => [],
+        'LxcConf' => {},
+        'Memory' => 512 * 1024 * 1024,
+        'MemorySwap' => 256 * 1024 * 1024,
+        'CpuShares' => 0.1,
         'PortBindings' => port_bindings,
         'PublishAllPorts' => false,
         'Privileged' => true,
+        'ReadonlyRootfs' => false,
+        'VolumesFrom' => [],
+        'CapAdd' => ['NET_ADMIN'],
+        'CapDrop' => ['CHOWN'],
         'RestartPolicy' => {
           'Name' => 'on-failure',
           'MaximumRetryCount' => 5,
         },
-        'CapAdd' => ['NET_ADMIN'],
-        'CapDrop' => ['CHOWN'],
+        'Devices' => [],
+        'Ulimits' => [],
       }
     }
     let(:env_vars) { ['USER=MY-USER'] }
@@ -400,15 +415,24 @@ describe DockerManager do
       let(:restart) { 'no' }
       let(:container_start_opts) {
         {
-            'Binds' => binds,
-            'PortBindings' => port_bindings,
-            'PublishAllPorts' => false,
-            'Privileged' => true,
-            'RestartPolicy' => {
-              'Name' => restart,
-            },
-            'CapAdd' => ['NET_ADMIN'],
-            'CapDrop' => ['CHOWN'],
+          'Binds' => binds,
+          'Links' => [],
+          'LxcConf' => {},
+          'Memory' => 512 * 1024 * 1024,
+          'MemorySwap' => 256 * 1024 * 1024,
+          'CpuShares' => 0.1,
+          'PortBindings' => port_bindings,
+          'PublishAllPorts' => false,
+          'Privileged' => true,
+          'ReadonlyRootfs' => false,
+          'VolumesFrom' => [],
+          'CapAdd' => ['NET_ADMIN'],
+          'CapDrop' => ['CHOWN'],
+          'RestartPolicy' => {
+            'Name' => restart,
+          },
+          'Devices' => [],
+          'Ulimits' => [],
         }
       }
 
