@@ -62,6 +62,7 @@ describe DockerManager do
   let(:persistent_volume) { '/data' }
   let(:restart) { 'on-failure:5' }
   let(:api_version) { DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION }
+  let(:allocated_host_port) { 10000 }
 
   before do
     allow(Docker).to receive(:version).and_return({ 'ApiVersion' => api_version })
@@ -69,6 +70,7 @@ describe DockerManager do
     allow(credentials).to receive(:username_value).with(guid).and_return(username_value)
     allow(credentials).to receive(:password_value).with(guid).and_return(password_value)
     allow(credentials).to receive(:dbname_value).with(guid).and_return(dbname_value)
+    expect(subject).to receive(:allocate_host_port).and_return(10000).at_most(:once)
   end
 
   describe '#initialize' do
@@ -317,13 +319,13 @@ describe DockerManager do
     }
     let(:env_vars) { ['USER=MY-USER'] }
     let(:binds) { [] }
-    let(:port_bindings) { { expose_port => [{}] } }
+    let(:port_bindings) { { expose_port => [{'HostPort' => '10000'}] } }
     let(:persistent_volume) { nil }
     let(:container_running) { true }
     let(:container_state) {
       {
         'State' => { 'Running' => container_running },
-        'Config' => { 'ExposedPorts' => { container_expose_port => {} }},
+        'Config' => { 'ExposedPorts' => { container_expose_port => [{'HostPort' => '10000'}] }},
       }
     }
 
@@ -385,7 +387,7 @@ describe DockerManager do
 
     context 'when there are no exposed ports' do
       let(:expose_port) { nil }
-      let(:port_bindings) { { container_expose_port => [{}] } }
+      let(:port_bindings) { { container_expose_port => [{'HostPort' => '10000'}] } }
 
       it 'should expose the container image exposed ports' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)

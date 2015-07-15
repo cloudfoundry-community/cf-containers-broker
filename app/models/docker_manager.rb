@@ -369,13 +369,23 @@ class DockerManager < ContainerManager
     Settings.host_directory
   end
 
+  def host_port_allocator
+    @host_port_allocator ||= HostPortAllocator.new(host_directory, 10000, 63000)
+  end
+
+  # Allocates the next available host port
+  def allocate_host_port
+    host_port_allocator.allocate_next_port
+  end
+
   def port_bindings(guid)
+    # 'PortBindings' => { '5000/tcp' => [{ 'HostPort' => '5000' }] }
     if expose_ports.empty?
       container = find(guid)
       image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
-      Hash[image_expose_ports.map { |ep, _| [ep, [{}]] }]
+      Hash[image_expose_ports.map { |ep, _| [ep, [{'HostPort' => allocate_host_port.to_s}]] }]
     else
-      Hash[expose_ports.map { |ep| [ep, [{}]] }]
+      Hash[expose_ports.map { |ep| [ep, [{'HostPort' => allocate_host_port.to_s}]] }]
     end
   end
 
