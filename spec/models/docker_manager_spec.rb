@@ -62,6 +62,8 @@ describe DockerManager do
   let(:persistent_volume) { '/data' }
   let(:restart) { 'on-failure:5' }
   let(:api_version) { DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION }
+  let(:host_post_allocator) { double('DockerHostPortAllocator') }
+  let(:host_port) { 32768 }
 
   before do
     allow(Docker).to receive(:version).and_return({ 'ApiVersion' => api_version })
@@ -69,6 +71,8 @@ describe DockerManager do
     allow(credentials).to receive(:username_value).with(guid).and_return(username_value)
     allow(credentials).to receive(:password_value).with(guid).and_return(password_value)
     allow(credentials).to receive(:dbname_value).with(guid).and_return(dbname_value)
+    allow(DockerHostPortAllocator).to receive(:instance).and_return(host_post_allocator)
+    allow(host_post_allocator).to receive(:allocate_host_port).with('tcp').and_return(host_port)
   end
 
   describe '#initialize' do
@@ -317,7 +321,7 @@ describe DockerManager do
     }
     let(:env_vars) { ['USER=MY-USER'] }
     let(:binds) { [] }
-    let(:port_bindings) { { expose_port => [{}] } }
+    let(:port_bindings) { { expose_port => [{ 'HostPort' => host_port.to_s }] } }
     let(:persistent_volume) { nil }
     let(:container_running) { true }
     let(:container_state) {
@@ -385,7 +389,7 @@ describe DockerManager do
 
     context 'when there are no exposed ports' do
       let(:expose_port) { nil }
-      let(:port_bindings) { { container_expose_port => [{}] } }
+      let(:port_bindings) { { container_expose_port => [{ 'HostPort' => host_port.to_s }] } }
 
       it 'should expose the container image exposed ports' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
@@ -437,6 +441,21 @@ describe DockerManager do
       }
 
       it 'should not add it at the start options' do
+        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+        expect(container).to receive(:start).with(container_start_opts)
+        expect(container).to receive(:json).and_return(container_state)
+        subject.create(guid)
+      end
+    end
+
+    context 'when allocate_docker_host_ports is not set' do
+      let(:port_bindings) { { expose_port => [{}] } }
+
+      before do
+        expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false)
+      end
+
+      it 'should not add host port bindings when starting a container' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)

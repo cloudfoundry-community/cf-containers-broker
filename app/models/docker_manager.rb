@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # Copyright (c) 2014 Pivotal Software, Inc. All Rights Reserved.
 require Rails.root.join('lib/exceptions')
+require Rails.root.join('lib/docker_host_port_allocator')
 require 'docker'
 require 'fileutils'
 
@@ -9,14 +10,15 @@ class DockerManager < ContainerManager
 
   MIN_SUPPORTED_DOCKER_API_VERSION = '1.13'
 
-  attr_reader :image, :tag, :command, :entrypoint, :restart, :workdir, :environment, :expose_ports,
-              :persistent_volumes, :user, :memory, :memory_swap, :cpu_shares, :privileged,
-              :cap_adds, :cap_drops
+  attr_reader :host_port_allocator, :image, :tag, :command, :entrypoint, :restart, :workdir,
+              :environment, :expose_ports, :persistent_volumes, :user, :memory, :memory_swap,
+              :cpu_shares, :privileged, :cap_adds, :cap_drops
 
   def initialize(attrs)
     super
     validate_docker_attrs(attrs)
     validate_docker_remote_api
+    @host_port_allocator = DockerHostPortAllocator.instance
 
     @image = attrs.fetch('image')
     @tag = attrs.fetch('tag', 'latest') || 'latest'
@@ -373,10 +375,18 @@ class DockerManager < ContainerManager
     if expose_ports.empty?
       container = find(guid)
       image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
-      Hash[image_expose_ports.map { |ep, _| [ep, [{}]] }]
+      Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
     else
-      Hash[expose_ports.map { |ep| [ep, [{}]] }]
+      Hash[expose_ports.map { |ep| [ep, [ host_port_binding(ep) ]] }]
     end
+  end
+
+  def host_port_binding(port)
+    return {} unless Settings['allocate_docker_host_ports']
+
+    p = port.split('/')
+    protocol = p.last || 'tcp'
+    return { 'HostPort' => host_port_allocator.allocate_host_port(protocol).to_s }
   end
 
   def network_info(container)

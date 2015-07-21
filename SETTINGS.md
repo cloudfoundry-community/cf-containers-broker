@@ -93,6 +93,12 @@ file according to your environment.
     provision unlimited containers.</td>
   </tr>
   <tr>
+    <td>allocate_docker_host_ports</td>
+    <td>N</td>
+    <td>Boolean</td>
+    <td>Allocate automatically host ports when binding a Docker container. This is useful in order to preserve the container exposed host ports in case of a VM restart.</td>
+  </tr>
+  <tr>
     <td>message_bus_servers</td>
     <td>Y</td>
     <td>Array of Strings</td>

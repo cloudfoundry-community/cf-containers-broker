@@ -21,7 +21,7 @@ and the latest stdout and stderr logs.
 
 The service broker does not deploy Docker, so you must have a Docker daemon up and running.
 
-**You must use Docker 1.1.2 or greater.**
+**You must use Docker 1.6 or greater.**
 
 If you are running Docker locally as a socket, there is no setup to do. If you are not or you have changed the path of
 the socket, you will have to set the `DOCKER_URL` environment variable to point to your socket or local/remote port.
@@ -104,7 +104,7 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
     it will use `always` by default. The restart policy will apply also in case the VM hosting the container is
     killed and CF/BOSH resurrects it. Might happen that the new VM gets a new IP address, and probably the containers
     will use a new random port. In order to make any application bound to a container work again,
-    the user must unbind/bind the application to the service again in order to pick the new IP/port.</td>
+    the user must unbind/bind the application to the service again in order to pick the new IP/port. If you want to preserve the bound host ports, you must set `allocate_docker_host_ports` setting [1].</td>
   </tr>
   <tr>
     <td>container.environment[]</td>
@@ -117,7 +117,7 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
     <td>N</td>
     <td>Array of Strings</td>
     <td>Network ports to map from the container to random host ports (format: port&lt;/protocol&gt;). If not set,
-    the broker will inspect the Docker image and it will expose all declared container ports [1] to a random host
+    the broker will inspect the Docker image and it will expose all declared container ports [2] to a random host
     port.</td>
   </tr>
   <tr>
@@ -171,7 +171,8 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
   </tr>
 </table>
 
-[1] See the Docker builder [EXPOSE](https://docs.docker.com/reference/builder/#expose) instruction
+[1] See [SETTINGS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md)
+[2] See the Docker builder [EXPOSE](https://docs.docker.com/reference/builder/#expose) instruction
 
 ## Example
 

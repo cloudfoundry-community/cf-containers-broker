@@ -19,6 +19,7 @@ defaults: &defaults
 
   host_directory: '/var/vcap/store/cf-containers-broker/'
   max_containers: 0
+  allocate_docker_host_ports: true
 
   message_bus_servers:
     - 'nats://127.0.0.1:4222'
