@@ -19,7 +19,7 @@ CfContainersBroker::Application.configure do
   # For large-scale production use, consider using a caching reverse proxy like nginx, varnish or squid.
   # config.action_dispatch.rack_cache = true
 
-  config.serve_static_assets = true
+  config.serve_static_files = true
   config.static_cache_control = 'public, max-age=3600'
   config.assets.compile = false
   config.assets.digest = true
