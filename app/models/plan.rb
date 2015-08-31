@@ -55,7 +55,7 @@ class Plan
     container_backend = attrs.fetch('backend')
 
     begin
-      require Rails.root.join("app/models/#{container_backend}_manager")
+      require Rails.root.join("app/models/#{container_backend}_manager").to_s
     rescue LoadError => error
       raise Exceptions::NotSupported, "Could not load Container Manager for backend `#{container_backend}'"
     end
