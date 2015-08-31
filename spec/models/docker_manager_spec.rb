@@ -462,6 +462,18 @@ describe DockerManager do
         subject.create(guid)
       end
     end
+
+    context 'when there are service arbitrary parameters' do
+      let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
+      let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo'] }
+
+      it 'should pass the arbitrary parameters as environment variables' do
+        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+        expect(container).to receive(:start).with(container_start_opts)
+        expect(container).to receive(:json).and_return(container_state)
+        subject.create(guid, parameters)
+      end
+    end
   end
 
   describe '#destroy' do

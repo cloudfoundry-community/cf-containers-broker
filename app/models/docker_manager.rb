@@ -61,9 +61,9 @@ class DockerManager < ContainerManager
     true
   end
 
-  def create(guid)
+  def create(guid, parameters = {})
     Rails.logger.info("Creating Docker container `#{container_name(guid)}'...")
-    container_create_opts = create_options(guid)
+    container_create_opts = create_options(guid, parameters)
     Rails.logger.info("+-> Create options: #{container_create_opts.inspect}")
     container = Docker::Container.create(container_create_opts)
 
@@ -237,7 +237,7 @@ class DockerManager < ContainerManager
     container.json.fetch('State', {}).fetch('Running', false)
   end
 
-  def create_options(guid)
+  def create_options(guid, parameters = {})
     {
       'name' => container_name(guid),
       'Hostname' => '',
@@ -249,7 +249,7 @@ class DockerManager < ContainerManager
       'Tty' => false,
       'OpenStdin' => false,
       'StdinOnce' => false,
-      'Env' => env_vars(guid),
+      'Env' => env_vars(guid, parameters),
       'Cmd' => command.split(' '),
       'Entrypoint' => entrypoint,
       'Image' => "#{image.strip}:#{tag.strip}",
@@ -287,11 +287,12 @@ class DockerManager < ContainerManager
     end
   end
 
-  def env_vars(guid)
+  def env_vars(guid, parameters = {})
     ev = build_custom_envvars
     ev << build_user_envvar(guid)
     ev << build_password_envvar(guid)
     ev << build_dbname_envvar(guid)
+    ev << build_parameters_envvars(parameters)
     ev.flatten.compact
   end
 
@@ -324,6 +325,12 @@ class DockerManager < ContainerManager
     else
       nil
     end
+  end
+
+  def build_parameters_envvars(parameters = {})
+    parameters.map do |key, value|
+      "#{key.to_s}=#{value.to_s}"
+    end.compact
   end
 
   def start_options(guid)

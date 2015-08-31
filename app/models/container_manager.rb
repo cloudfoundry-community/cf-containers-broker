@@ -21,7 +21,7 @@ class ContainerManager
     raise Exceptions::NotImplemented, "`can_allocate?' is not implemented by `#{self.class}'"
   end
 
-  def create(guid)
+  def create(guid, parameters = {})
     raise Exceptions::NotImplemented, "`create' is not implemented by `#{self.class}'"
   end
 

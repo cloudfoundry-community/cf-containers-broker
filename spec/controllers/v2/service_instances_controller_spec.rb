@@ -9,6 +9,7 @@ describe V2::ServiceInstancesController do
   let(:organization_guid) { 'organization-guid' }
   let(:space_guid) { 'space_guid' }
   let(:plan) { double('Plan', max_containers: max_plan_containers) }
+  let(:parameters) { { 'foo' => 'bar' } }
   let(:container_manager) { double('ContainerManager') }
   let(:container) { double('Container') }
   let(:can_allocate) { true }
@@ -24,7 +25,7 @@ describe V2::ServiceInstancesController do
 
   describe '#update' do
     let(:make_request) do
-      put :update, { id: instance_id, service_id: service_id, plan_id: plan_id, organization_guid: organization_guid, space_guid: space_guid }
+      put :update, { id: instance_id, service_id: service_id, plan_id: plan_id, organization_guid: organization_guid, space_guid: space_guid, parameters: parameters }
     end
 
     before do
@@ -44,7 +45,7 @@ describe V2::ServiceInstancesController do
                                      .with(max_containers, max_plan_containers)
                                      .and_return(can_allocate)
         expect(container_manager).to receive(:find).with(instance_id).and_return(nil)
-        expect(container_manager).to receive(:create).with(instance_id)
+        expect(container_manager).to receive(:create).with(instance_id, parameters)
         expect(Settings).to receive(:external_host).and_return(external_host)
       end
 

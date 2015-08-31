@@ -7,6 +7,7 @@ class V2::ServiceInstancesController < V2::BaseController
     plan_guid = params.fetch(:plan_id)
     organization_guid = params.fetch(:organization_guid)
     space_guid = params.fetch(:space_guid)
+    parameters = params.fetch(:parameters, {})
 
     unless plan = Catalog.find_plan_by_guid(plan_guid)
       return render status: 404, json: {
@@ -19,7 +20,7 @@ class V2::ServiceInstancesController < V2::BaseController
         if plan.container_manager.find(instance_guid)
           render status: 409, json: { 'description' => 'Service instance already exists' }
         else
-          plan.container_manager.create(instance_guid)
+          plan.container_manager.create(instance_guid, parameters)
           render status: 201, json: { dashboard_url: build_dashboard_url(service_guid,
                                                                          plan_guid,
                                                                          instance_guid) }
