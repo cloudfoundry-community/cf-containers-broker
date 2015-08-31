@@ -8,7 +8,7 @@ This service broker allows users to provision services that runs inside a
 [compatible container backend](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/README.md#prerequisites)
 and bind applications to the service. The management tasks that the broker can perform are:
 
- * Provision a service container with random credentials
+ * Provision a service container with random credentials and service arbitrary parameters
  * Bind a service container to an application:
     * Expose the credentials to access the provisioned service (see [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md) for details)
     * Provide a syslog drain service for your application logs (see [SYSLOG_DRAIN.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SYSLOG_DRAIN.md) for details)

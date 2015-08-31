@@ -6,6 +6,7 @@ perform actions against Docker. It supports:
 
 * Prefetching Docker images when the broker is started to speed up containers creation.
 * Creating Docker containers when the broker provisions a service.
+* Injecting service arbitrary parameters into the Docker container via environment variables on provision time.
 * Creating random usernames, passwords and dbnames when binding an application to the service. Those credentials are
 sent to the Docker container via environment variables, so the Docker image must support those variables in order to
 create the right username/password and dbname (see [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md)
