@@ -6,7 +6,13 @@ branches:
 
 rvm:
   - 2.0.0
+  - 2.1.0
+  - 2.2.0
 
 bundler_args: --deployment --without development
 
 script: bundle exec rspec spec
+
+sudo: false
+
+cache: bundler
