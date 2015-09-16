@@ -6,7 +6,8 @@ class V2::ServiceBindingsController < V2::BaseController
     instance_guid = params.fetch(:service_instance_id)
     service_guid = params.fetch(:service_id)
     plan_guid = params.fetch(:plan_id)
-    app_guid = params.fetch(:app_guid)
+    app_guid = params.fetch(:app_guid, "")
+    parameters = params.fetch(:parameters, {})
 
     unless plan = Catalog.find_plan_by_guid(plan_guid)
       return render status: 404, json: {

@@ -7,7 +7,6 @@ describe V2::ServiceBindingsController do
   let(:plan_id) { 'plan-id' }
   let(:instance_id) { 'instance-id' }
   let(:binding_id) { 'binding-id' }
-  let(:app_guid) { 'app-guid' }
   let(:plan) { double('Plan') }
   let(:container_manager) { double('ContainerManager') }
   let(:container) { double('Container') }
@@ -21,8 +20,7 @@ describe V2::ServiceBindingsController do
 
   describe '#update' do
     let(:make_request) do
-      put :update, { id: binding_id, service_instance_id: instance_id, service_id: service_id, plan_id: plan_id,
-                     app_guid: app_guid }
+      put :update, { id: binding_id, service_instance_id: instance_id, service_id: service_id, plan_id: plan_id }
     end
 
     it_behaves_like 'a controller action that requires basic auth'
