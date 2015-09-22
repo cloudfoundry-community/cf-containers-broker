@@ -7,7 +7,7 @@ class V2::ServiceInstancesController < V2::BaseController
     plan_guid = params.fetch(:plan_id)
     organization_guid = params.fetch(:organization_guid)
     space_guid = params.fetch(:space_guid)
-    parameters = params.fetch(:parameters, {})
+    parameters = params.fetch(:parameters, {}) || {}
 
     unless plan = Catalog.find_plan_by_guid(plan_guid)
       return render status: 404, json: {
