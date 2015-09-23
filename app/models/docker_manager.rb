@@ -74,6 +74,7 @@ class DockerManager < ContainerManager
 
     unless container_running?(container)
       container.remove(v: true, force: true) rescue nil #nop
+      destroy_volumes(guid)
       raise Exceptions::BackendError, "Cannot start Docker container `#{container_name(guid)}'"
     end
   end
@@ -259,6 +260,7 @@ class DockerManager < ContainerManager
       'NetworkDisabled' => false,
       'ExposedPorts' => {},
       'HostConfig' => {
+        'Binds' => volume_bindings(guid),
         'Memory' => convert_memory(memory),
         'MemorySwap' => convert_memory(memory_swap),
         'CpuShares' => cpu_shares,
@@ -335,7 +337,6 @@ class DockerManager < ContainerManager
 
   def start_options(guid)
     {
-      'Binds' => volume_bindings(guid),
       'Links' => [],
       'LxcConf' => {},
       'Memory' => convert_memory(memory),

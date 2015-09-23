@@ -288,6 +288,7 @@ describe DockerManager do
         'NetworkDisabled' => false,
         'ExposedPorts' => {},
         'HostConfig' => {
+          'Binds' => binds,
           'Memory' => 512 * 1024 * 1024,
           'MemorySwap' => 256 * 1024 * 1024,
           'CpuShares' => 0.1,
@@ -298,7 +299,6 @@ describe DockerManager do
     }
     let(:container_start_opts) {
       {
-        'Binds' => binds,
         'Links' => [],
         'LxcConf' => {},
         'Memory' => 512 * 1024 * 1024,
@@ -419,7 +419,6 @@ describe DockerManager do
       let(:restart) { 'no' }
       let(:container_start_opts) {
         {
-          'Binds' => binds,
           'Links' => [],
           'LxcConf' => {},
           'Memory' => 512 * 1024 * 1024,
