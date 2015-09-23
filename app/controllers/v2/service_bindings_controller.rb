@@ -37,8 +37,6 @@ class V2::ServiceBindingsController < V2::BaseController
   def destroy
     binding_guid = params.fetch(:id)
     instance_guid = params.fetch(:service_instance_id)
-    service_guid = params.fetch(:service_id)
-    plan_guid = params.fetch(:plan_id)
 
     render status: 200, json: {}
   end
