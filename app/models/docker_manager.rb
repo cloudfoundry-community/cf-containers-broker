@@ -79,6 +79,29 @@ class DockerManager < ContainerManager
     end
   end
 
+  def update(guid, parameters = {})
+    Rails.logger.info("Updating Docker container `#{container_name(guid)}'...")
+    unless container = find(guid)
+      raise Exceptions::NotFound, "Docker container `#{container_name(guid)}' not found"
+    end
+    container.kill
+    container.remove(v: true, force: true)
+
+    container_create_opts = create_options(guid, parameters)
+    Rails.logger.info("+-> Create/update options: #{container_create_opts.inspect}")
+    container = Docker::Container.create(container_create_opts)
+
+    container_start_opts = start_options(guid)
+    Rails.logger.info("Starting Docker container `#{container_name(guid)}'...")
+    Rails.logger.info("+-> Start options: #{container_start_opts.inspect}")
+    container.start(container_start_opts)
+
+    unless container_running?(container)
+      container.remove(v: true, force: true) rescue nil #nop
+      raise Exceptions::BackendError, "Cannot start Docker container `#{container_name(guid)}', volumes not deleted"
+    end
+  end
+
   def destroy(guid)
     Rails.logger.info("Destroying Docker container `#{container_name(guid)}'...")
     if container = find(guid)
