@@ -18,7 +18,8 @@ class V2::ServiceInstancesController < V2::BaseController
     begin
       if plan.container_manager.can_allocate?(Settings.max_containers, plan.max_containers)
         if plan.container_manager.find(instance_guid)
-          render status: 409, json: { 'description' => 'Service instance already exists' }
+          plan.container_manager.update(instance_guid, parameters)
+          render status: 200, json: {}
         else
           plan.container_manager.create(instance_guid, parameters)
           render status: 201, json: { dashboard_url: build_dashboard_url(service_guid,

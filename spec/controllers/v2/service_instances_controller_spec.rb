@@ -23,7 +23,7 @@ describe V2::ServiceInstancesController do
     allow(Docker).to receive(:version).and_return({ 'ApiVersion' => DockerManager::MIN_SUPPORTED_DOCKER_API_VERSION })
   end
 
-  describe '#update' do
+  describe 'create - #update' do
     let(:make_request) do
       put :update, { id: instance_id, service_id: service_id, plan_id: plan_id, organization_guid: organization_guid, space_guid: space_guid, parameters: parameters }
     end
@@ -93,19 +93,61 @@ describe V2::ServiceInstancesController do
       end
     end
 
-    context 'when the service instance already exist' do
-      it 'returns a 409' do
-        expect(Catalog).to receive(:find_plan_by_guid).with(plan_id).and_return(plan)
-        expect(plan).to receive(:container_manager).twice.and_return(container_manager)
-        expect(container_manager).to receive(:can_allocate?)
-                                     .with(max_containers, max_plan_containers)
-                                     .and_return(can_allocate)
-        expect(container_manager).to receive(:find).with(instance_id).and_return(container)
+    context 'when the service plan does not exist' do
+      it 'returns a 404' do
+        expect(Catalog).to receive(:find_plan_by_guid).with(plan_id).and_return(nil)
 
         make_request
 
-        expect(response.status).to eq(409)
-        expect(JSON.parse(response.body)).to eq({ 'description' => 'Service instance already exists' })
+        expect(response.status).to eq(404)
+        expect(JSON.parse(response.body)).to eq({
+          'description' => "Cannot create a service instance. Plan #{plan_id} was not found in the catalog"
+        })
+      end
+    end
+  end
+
+  describe 'patch - #update' do
+    let(:prev_plan_id) { 'prev-plan-id' }
+    let(:make_request) do
+      put :update, {
+        id: instance_id, plan_id: plan_id, service_id: service_id, organization_guid: organization_guid, space_guid: space_guid, parameters: parameters,
+        previous_values: {plan_id: prev_plan_id, service_id: service_id, organization_guid: organization_guid, space_guid: space_guid}
+      }
+    end
+
+    before do
+      allow(Settings).to receive(:max_containers).and_return(max_containers)
+      allow(Settings).to receive(:ssl_enabled).and_return(ssl_enabled)
+    end
+
+    it_behaves_like 'a controller action that requires basic auth'
+
+    it_behaves_like 'a controller action that logs its request and response headers and body'
+
+    context 'when the service instance is update' do
+      let(:instance) { double('ServiceInstance') }
+
+      before do
+        expect(Catalog).to receive(:find_plan_by_guid).with(plan_id).and_return(plan)
+        expect(plan).to receive(:container_manager).exactly(3).and_return(container_manager)
+        expect(container_manager).to receive(:can_allocate?)
+                                     .with(max_containers, max_plan_containers)
+                                     .and_return(can_allocate)
+        expect(container_manager).to receive(:find).with(instance_id).and_return(instance)
+        expect(container_manager).to receive(:update).with(instance_id, parameters)
+      end
+
+      it 'returns a 200' do
+        make_request
+
+        expect(response.status).to eq(200)
+      end
+
+      it 'returns an empty hash' do
+        make_request
+
+        expect(JSON.parse(response.body)).to eq({})
       end
     end
 
