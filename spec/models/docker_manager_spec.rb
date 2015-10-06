@@ -479,9 +479,12 @@ describe DockerManager do
     describe '#update' do
       let(:persistent_volume) { '/data' }
       let(:binds) { ["/tmp/#{container_name}#{persistent_volume}:#{persistent_volume}"] }
+      let(:port_bindings) { {"5432/tcp"=>[{"HostIp"=>"", "HostPort"=>"55555"}]} }
 
       it 'should kill then recreate the container with existing persistent data' do
         expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+        expect(container).to receive(:json).and_return({
+          'HostConfig' => {'PortBindings' => port_bindings}})
         expect(container).to receive(:kill)
         expect(container).to receive(:remove).with(v: true, force: true)
 
@@ -491,6 +494,7 @@ describe DockerManager do
         expect(FileUtils).to receive(:mkdir_p).with("/tmp/#{container_name}#{persistent_volume}")
         expect(FileUtils).to receive(:chmod_R).with(0777, "/tmp/#{container_name}#{persistent_volume}")
 
+        container_start_opts['PortBindings'] = port_bindings
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)
 

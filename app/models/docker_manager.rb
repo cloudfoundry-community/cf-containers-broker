@@ -84,6 +84,7 @@ class DockerManager < ContainerManager
     unless container = find(guid)
       raise Exceptions::NotFound, "Docker container `#{container_name(guid)}' not found"
     end
+    port_bindings = container.json['HostConfig']['PortBindings']
     container.kill
     container.remove(v: true, force: true)
 
@@ -92,6 +93,7 @@ class DockerManager < ContainerManager
     container = Docker::Container.create(container_create_opts)
 
     container_start_opts = start_options(guid)
+    container_start_opts['PortBindings'] = port_bindings
     Rails.logger.info("Starting Docker container `#{container_name(guid)}'...")
     Rails.logger.info("+-> Start options: #{container_start_opts.inspect}")
     container.start(container_start_opts)
