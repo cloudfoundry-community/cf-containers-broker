@@ -81,7 +81,10 @@ describe V2::ServiceInstancesController do
 
       it 'returns a 507' do
         expect(Catalog).to receive(:find_plan_by_guid).with(plan_id).and_return(plan)
-        expect(plan).to receive(:container_manager).and_return(container_manager)
+        expect(plan).to receive(:container_manager).and_return(container_manager).twice
+        expect(container_manager).to receive(:find)
+                                     .with(instance_id)
+                                     .and_return(nil)
         expect(container_manager).to receive(:can_allocate?)
                                      .with(max_containers, max_plan_containers)
                                      .and_return(can_allocate)
@@ -130,10 +133,8 @@ describe V2::ServiceInstancesController do
 
       before do
         expect(Catalog).to receive(:find_plan_by_guid).with(plan_id).and_return(plan)
-        expect(plan).to receive(:container_manager).exactly(3).and_return(container_manager)
-        expect(container_manager).to receive(:can_allocate?)
-                                     .with(max_containers, max_plan_containers)
-                                     .and_return(can_allocate)
+        expect(plan).to receive(:container_manager).exactly(2).and_return(container_manager)
+        expect(container_manager).to_not receive(:can_allocate?)
         expect(container_manager).to receive(:find).with(instance_id).and_return(instance)
         expect(container_manager).to receive(:update).with(instance_id, parameters)
       end

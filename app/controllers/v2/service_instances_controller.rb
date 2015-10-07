@@ -3,12 +3,7 @@
 class V2::ServiceInstancesController < V2::BaseController
   def update
     instance_guid = params.fetch(:id)
-    service_guid = params.fetch(:service_id)
     plan_guid = params.fetch(:plan_id)
-    organization_guid = params.fetch(:organization_guid)
-    space_guid = params.fetch(:space_guid)
-    parameters = params.fetch(:parameters, {}) || {}
-
     unless plan = Catalog.find_plan_by_guid(plan_guid)
       return render status: 404, json: {
           'description' => "Cannot create a service instance. Plan #{plan_guid} was not found in the catalog"
@@ -16,25 +11,16 @@ class V2::ServiceInstancesController < V2::BaseController
     end
 
     begin
-      if plan.container_manager.can_allocate?(Settings.max_containers, plan.max_containers)
-        if plan.container_manager.find(instance_guid)
-          plan.container_manager.update(instance_guid, parameters)
-          render status: 200, json: {}
-        else
-          plan.container_manager.create(instance_guid, parameters)
-          render status: 201, json: { dashboard_url: build_dashboard_url(service_guid,
-                                                                         plan_guid,
-                                                                         instance_guid) }
-        end
+      if plan.container_manager.find(instance_guid)
+        update_service(instance_guid, plan_guid, plan)
       else
-        render status: 507, json: { 'description' => 'Service capacity has been reached' }
+        create_service(instance_guid, plan_guid, plan)
       end
     rescue Exception => e
       Rails.logger.info(e.inspect)
       Rails.logger.info(e.backtrace.join("\n"))
       render status: 500, json: { 'description' => e.inspect }
     end
-
   end
 
   def destroy
@@ -63,6 +49,31 @@ class V2::ServiceInstancesController < V2::BaseController
   end
 
   private
+
+  def create_service(instance_guid, plan_guid, plan)
+    service_guid = params.fetch(:service_id)
+    organization_guid = params.fetch(:organization_guid)
+    space_guid = params.fetch(:space_guid)
+    parameters = params.fetch(:parameters, {}) || {}
+
+    if plan.container_manager.can_allocate?(Settings.max_containers, plan.max_containers)
+      plan.container_manager.create(instance_guid, parameters)
+      render status: 201, json: { dashboard_url: build_dashboard_url(service_guid,
+                                                                     plan_guid,
+                                                                     instance_guid) }
+    else
+      render status: 507, json: { 'description' => 'Service capacity has been reached' }
+    end
+  end
+
+  def update_service(instance_guid, plan_guid, plan)
+    service_guid = params.fetch(:service_id)
+    parameters = params.fetch(:parameters, {}) || {}
+    previous_values = params.fetch(:previous_values, {}) || {}
+
+    plan.container_manager.update(instance_guid, parameters)
+    render status: 200, json: {}
+  end
 
   def build_dashboard_url(service_guid, plan_guid, instance_guid)
     domain = Settings.external_host
