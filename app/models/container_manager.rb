@@ -25,6 +25,10 @@ class ContainerManager
     raise Exceptions::NotImplemented, "`create' is not implemented by `#{self.class}'"
   end
 
+  def update(guid, parameters = {})
+    raise Exceptions::NotImplemented, "`update' is not implemented by `#{self.class}'"
+  end
+
   def destroy(guid)
     raise Exceptions::NotImplemented, "`destroy' is not implemented by `#{self.class}'"
   end

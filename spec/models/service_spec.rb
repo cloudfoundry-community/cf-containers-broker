@@ -23,6 +23,7 @@ describe Service do
     'plans'            => [
       double('Plan')
     ],
+    'plan_updateable'  => true,
     'dashboard_client' => {
       'id'           => 'client-id',
       'secret'       => 'client-secret',
@@ -86,12 +87,16 @@ describe Service do
       end
 
       it 'sets the plans field to an empty array' do
-         expect(service.plans).to eq([])
-       end
+        expect(service.plans).to eq([])
+      end
+
+      it 'sets the plan_updateable field to a boolean' do
+        expect(service.plan_updateable).to eq(true)
+      end
 
       it 'sets the dashboard_client field to an empty hash' do
-         expect(service.dashboard_client).to eq({})
-       end
+        expect(service.dashboard_client).to eq({})
+      end
     end
   end
 

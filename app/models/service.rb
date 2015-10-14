@@ -3,7 +3,8 @@
 require Rails.root.join('app/models/plan')
 
 class Service
-  attr_reader :id, :name, :description, :bindable, :tags, :metadata, :requires, :plans, :dashboard_client
+  attr_reader :id, :name, :description, :bindable, :tags, :metadata, :requires, :plans
+  attr_reader :plan_updateable, :dashboard_client
 
   def self.build(attrs)
     plan_attrs = attrs['plans'] || []
@@ -22,6 +23,7 @@ class Service
     @metadata    = attrs.fetch('metadata', nil)
     @requires    = attrs.fetch('requires', []) || []
     @plans       = attrs.fetch('plans')
+    @plan_updateable  = attrs.fetch('plan_updateable', true) || true
     @dashboard_client = attrs.fetch('dashboard_client', {}) || {}
   end
 
@@ -35,6 +37,7 @@ class Service
       'metadata'         => metadata,
       'requires'         => requires,
       'plans'            => plans.map(&:to_hash),
+      'plan_updateable'  => plan_updateable,
       'dashboard_client' => dashboard_client,
     }
   end

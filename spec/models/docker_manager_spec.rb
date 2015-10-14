@@ -265,7 +265,7 @@ describe DockerManager do
     end
   end
 
-  describe '#create' do
+  describe 'crud' do
     let(:container_create_opts) {
       {
         'name' => container_name,
@@ -330,147 +330,184 @@ describe DockerManager do
         'Config' => { 'ExposedPorts' => { container_expose_port => {} }},
       }
     }
+    describe '#create' do
 
-    it 'should create and start a container' do
-      expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-      expect(container).to receive(:start).with(container_start_opts)
-      expect(container).to receive(:json).and_return(container_state)
-      subject.create(guid)
-    end
-
-    context 'when container cannot be started' do
-      let(:container_running) { false }
-
-      it 'should remove the failed container' do
+      it 'should create and start a container' do
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)
-        expect(container).to receive(:remove).with(v: true, force: true)
-        expect do
-          subject.create(guid)
-        end.to raise_error(Exceptions::BackendError, "Cannot start Docker container `#{container_name}'")
-      end
-    end
-
-    context 'when there are credentials' do
-      before do
-        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-        expect(container).to receive(:start).with(container_start_opts)
-        expect(container).to receive(:json).and_return(container_state)
-      end
-
-      context 'with a username key' do
-        let(:username_key) { 'USERNAME-KEY' }
-        let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}"] }
-
-        it 'should inject the username environment variable' do
-          subject.create(guid)
-        end
-      end
-
-      context 'with a password key' do
-        let(:password_key) { 'PASSWORD-KEY' }
-        let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}"] }
-
-        it 'should inject the password environment variable' do
-          subject.create(guid)
-        end
-      end
-
-      context 'with a dbname key' do
-        let(:dbname_key) { 'DBNAME-KEY' }
-        let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}"] }
-
-        it 'should inject the dbname environment variable' do
-          subject.create(guid)
-        end
-      end
-    end
-
-    context 'when there are no exposed ports' do
-      let(:expose_port) { nil }
-      let(:port_bindings) { { container_expose_port => [{ 'HostPort' => host_port.to_s }] } }
-
-      it 'should expose the container image exposed ports' do
-        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-        expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
-        expect(container).to receive(:start).with(container_start_opts)
-        expect(container).to receive(:json).twice.and_return(container_state)
         subject.create(guid)
       end
+
+      context 'when container cannot be started' do
+        let(:container_running) { false }
+
+        it 'should remove the failed container' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          expect(container).to receive(:remove).with(v: true, force: true)
+          expect do
+            subject.create(guid)
+          end.to raise_error(Exceptions::BackendError, "Cannot start Docker container `#{container_name}'")
+        end
+      end
+
+      context 'when there are credentials' do
+        before do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+        end
+
+        context 'with a username key' do
+          let(:username_key) { 'USERNAME-KEY' }
+          let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}"] }
+
+          it 'should inject the username environment variable' do
+            subject.create(guid)
+          end
+        end
+
+        context 'with a password key' do
+          let(:password_key) { 'PASSWORD-KEY' }
+          let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}"] }
+
+          it 'should inject the password environment variable' do
+            subject.create(guid)
+          end
+        end
+
+        context 'with a dbname key' do
+          let(:dbname_key) { 'DBNAME-KEY' }
+          let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}"] }
+
+          it 'should inject the dbname environment variable' do
+            subject.create(guid)
+          end
+        end
+      end
+
+      context 'when there are no exposed ports' do
+        let(:expose_port) { nil }
+        let(:port_bindings) { { container_expose_port => [{ 'HostPort' => host_port.to_s }] } }
+
+        it 'should expose the container image exposed ports' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).twice.and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
+      context 'when there are persistent volumes' do
+        let(:persistent_volume) { '/data' }
+        let(:binds) { ["/tmp/#{container_name}#{persistent_volume}:#{persistent_volume}"] }
+
+        it 'should create a host directory and mount it to the container' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(Settings).to receive(:host_directory).and_return('/tmp')
+          expect(FileUtils).to receive(:mkdir_p).with("/tmp/#{container_name}#{persistent_volume}")
+          expect(FileUtils).to receive(:chmod_R).with(0777, "/tmp/#{container_name}#{persistent_volume}")
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
+      context 'when restart policy does not include a retry count' do
+        let(:restart) { 'no' }
+        let(:container_start_opts) {
+          {
+            'Links' => [],
+            'LxcConf' => {},
+            'Memory' => 512 * 1024 * 1024,
+            'MemorySwap' => 256 * 1024 * 1024,
+            'CpuShares' => 0.1,
+            'PortBindings' => port_bindings,
+            'PublishAllPorts' => false,
+            'Privileged' => true,
+            'ReadonlyRootfs' => false,
+            'VolumesFrom' => [],
+            'CapAdd' => ['NET_ADMIN'],
+            'CapDrop' => ['CHOWN'],
+            'RestartPolicy' => {
+              'Name' => restart,
+            },
+            'Devices' => [],
+            'Ulimits' => [],
+          }
+        }
+
+        it 'should not add it at the start options' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
+      context 'when allocate_docker_host_ports is not set' do
+        let(:port_bindings) { { expose_port => [{}] } }
+
+        before do
+          expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false)
+        end
+
+        it 'should not add host port bindings when starting a container' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
+      context 'when there are service arbitrary parameters' do
+        let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
+        let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo'] }
+
+        it 'should pass the arbitrary parameters as environment variables' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid, parameters)
+        end
+      end
     end
 
-    context 'when there are persistent volumes' do
+    describe '#update' do
       let(:persistent_volume) { '/data' }
       let(:binds) { ["/tmp/#{container_name}#{persistent_volume}:#{persistent_volume}"] }
+      let(:port_bindings) { {"5432/tcp"=>[{"HostIp"=>"", "HostPort"=>"55555"}]} }
 
-      it 'should create a host directory and mount it to the container' do
+      it 'should kill then recreate the container with existing persistent data' do
+        expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+        expect(container).to receive(:json).and_return({
+          'HostConfig' => {'PortBindings' => port_bindings}})
+        expect(container).to receive(:kill)
+        expect(container).to receive(:remove).with(v: true, force: true)
+
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+        # idempotently recreates existing volume folder on host machine
         expect(Settings).to receive(:host_directory).and_return('/tmp')
         expect(FileUtils).to receive(:mkdir_p).with("/tmp/#{container_name}#{persistent_volume}")
         expect(FileUtils).to receive(:chmod_R).with(0777, "/tmp/#{container_name}#{persistent_volume}")
+
+        container_start_opts['PortBindings'] = port_bindings
         expect(container).to receive(:start).with(container_start_opts)
         expect(container).to receive(:json).and_return(container_state)
-        subject.create(guid)
-      end
-    end
 
-    context 'when restart policy does not include a retry count' do
-      let(:restart) { 'no' }
-      let(:container_start_opts) {
-        {
-          'Links' => [],
-          'LxcConf' => {},
-          'Memory' => 512 * 1024 * 1024,
-          'MemorySwap' => 256 * 1024 * 1024,
-          'CpuShares' => 0.1,
-          'PortBindings' => port_bindings,
-          'PublishAllPorts' => false,
-          'Privileged' => true,
-          'ReadonlyRootfs' => false,
-          'VolumesFrom' => [],
-          'CapAdd' => ['NET_ADMIN'],
-          'CapDrop' => ['CHOWN'],
-          'RestartPolicy' => {
-            'Name' => restart,
-          },
-          'Devices' => [],
-          'Ulimits' => [],
-        }
-      }
-
-      it 'should not add it at the start options' do
-        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-        expect(container).to receive(:start).with(container_start_opts)
-        expect(container).to receive(:json).and_return(container_state)
-        subject.create(guid)
-      end
-    end
-
-    context 'when allocate_docker_host_ports is not set' do
-      let(:port_bindings) { { expose_port => [{}] } }
-
-      before do
-        expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false)
+        subject.update(guid)
       end
 
-      it 'should not add host port bindings when starting a container' do
-        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-        expect(container).to receive(:start).with(container_start_opts)
-        expect(container).to receive(:json).and_return(container_state)
-        subject.create(guid)
-      end
-    end
-
-    context 'when there are service arbitrary parameters' do
-      let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
-      let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo'] }
-
-      it 'should pass the arbitrary parameters as environment variables' do
-        expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-        expect(container).to receive(:start).with(container_start_opts)
-        expect(container).to receive(:json).and_return(container_state)
-        subject.create(guid, parameters)
+      context 'when the container does not exists' do
+        it 'should raise an Exception' do
+          expect(Docker::Container).to receive(:get).with(container_name).and_raise(Docker::Error::NotFoundError)
+          expect do
+            subject.update(guid)
+          end.to raise_error(Exceptions::NotFound, "Docker container `#{container_name}' not found")
+        end
       end
     end
   end
