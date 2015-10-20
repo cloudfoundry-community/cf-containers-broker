@@ -319,7 +319,7 @@ describe DockerManager do
         'Ulimits' => [],
       }
     }
-    let(:env_vars) { ['USER=MY-USER'] }
+    let(:env_vars) { ['USER=MY-USER', 'PORT_1234_TCP=32768', 'HOSTPORT_1234_TCP=127.0.0.1:32768'] }
     let(:binds) { [] }
     let(:port_bindings) { { expose_port => [{ 'HostPort' => host_port.to_s }] } }
     let(:persistent_volume) { nil }
@@ -362,7 +362,7 @@ describe DockerManager do
 
         context 'with a username key' do
           let(:username_key) { 'USERNAME-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}", 'PORT_1234_TCP=32768', 'HOSTPORT_1234_TCP=127.0.0.1:32768'] }
 
           it 'should inject the username environment variable' do
             subject.create(guid)
@@ -371,7 +371,7 @@ describe DockerManager do
 
         context 'with a password key' do
           let(:password_key) { 'PASSWORD-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}", 'PORT_1234_TCP=32768', 'HOSTPORT_1234_TCP=127.0.0.1:32768'] }
 
           it 'should inject the password environment variable' do
             subject.create(guid)
@@ -380,7 +380,7 @@ describe DockerManager do
 
         context 'with a dbname key' do
           let(:dbname_key) { 'DBNAME-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}", 'PORT_1234_TCP=32768', 'HOSTPORT_1234_TCP=127.0.0.1:32768'] }
 
           it 'should inject the dbname environment variable' do
             subject.create(guid)
@@ -391,12 +391,13 @@ describe DockerManager do
       context 'when there are no exposed ports' do
         let(:expose_port) { nil }
         let(:port_bindings) { { container_expose_port => [{ 'HostPort' => host_port.to_s }] } }
+        let(:env_vars) { ['USER=MY-USER', 'PORT_5678_TCP=32768', 'HOSTPORT_5678_TCP=127.0.0.1:32768'] }
 
         it 'should expose the container image exposed ports' do
           expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-          expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
+          expect(Docker::Container).to receive(:get).with(container_name).twice.and_return(container)
           expect(container).to receive(:start).with(container_start_opts)
-          expect(container).to receive(:json).twice.and_return(container_state)
+          expect(container).to receive(:json).exactly(3).and_return(container_state)
           subject.create(guid)
         end
       end
@@ -450,9 +451,10 @@ describe DockerManager do
 
       context 'when allocate_docker_host_ports is not set' do
         let(:port_bindings) { { expose_port => [{}] } }
+        let(:env_vars) { ['USER=MY-USER'] }
 
         before do
-          expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false)
+          expect(Settings).to receive(:[]).with('allocate_docker_host_ports').twice.and_return(false)
         end
 
         it 'should not add host port bindings when starting a container' do
@@ -465,7 +467,7 @@ describe DockerManager do
 
       context 'when there are service arbitrary parameters' do
         let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
-        let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo'] }
+        let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo', 'PORT_1234_TCP=32768', 'HOSTPORT_1234_TCP=127.0.0.1:32768'] }
 
         it 'should pass the arbitrary parameters as environment variables' do
           expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
