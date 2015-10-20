@@ -320,6 +320,7 @@ class DockerManager < ContainerManager
     ev << build_password_envvar(guid)
     ev << build_dbname_envvar(guid)
     ev << build_parameters_envvars(parameters)
+    ev << build_port_bindings(guid)
     ev.flatten.compact
   end
 
@@ -358,6 +359,20 @@ class DockerManager < ContainerManager
     parameters.map do |key, value|
       "#{key.to_s}=#{value.to_s}"
     end.compact
+  end
+
+  def build_port_bindings(guid)
+    # { '5678/tcp' => [{ 'HostPort' => '32768' }] }
+    port_bindings(guid).inject([]) do |vars, exposed_port_host_port_binding|
+      exposed_port, host_port_binding = exposed_port_host_port_binding
+      port_env_key = "PORT_#{exposed_port}".gsub("/", "_").upcase  # PORT_5678_TCP
+      hostport_env_key = "HOST#{port_env_key}"                     # HOSTPORT_5678_TCP
+      if host_port = host_port_binding.first['HostPort']
+        vars << "#{port_env_key}=#{host_port}"                             # PORT_5678_TCP=32768
+        vars << "#{hostport_env_key}=#{Settings.external_ip}:#{host_port}" # HOSTPORT_5678_TCP=1.2.3.4:32768
+      end
+      vars
+    end
   end
 
   def start_options(guid)
