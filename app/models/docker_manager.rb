@@ -319,6 +319,7 @@ class DockerManager < ContainerManager
     ev << build_user_envvar(guid)
     ev << build_password_envvar(guid)
     ev << build_dbname_envvar(guid)
+    ev << build_container_envvar(guid)
     ev << build_parameters_envvars(parameters)
     ev.flatten.compact
   end
@@ -352,6 +353,10 @@ class DockerManager < ContainerManager
     else
       nil
     end
+  end
+
+  def build_container_envvar(guid)
+    ["NAME=#{container_name(guid)}"]
   end
 
   def build_parameters_envvars(parameters = {})

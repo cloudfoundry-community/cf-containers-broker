@@ -319,7 +319,7 @@ describe DockerManager do
         'Ulimits' => [],
       }
     }
-    let(:env_vars) { ['USER=MY-USER'] }
+    let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}"] }
     let(:binds) { [] }
     let(:port_bindings) { { expose_port => [{ 'HostPort' => host_port.to_s }] } }
     let(:persistent_volume) { nil }
@@ -362,7 +362,7 @@ describe DockerManager do
 
         context 'with a username key' do
           let(:username_key) { 'USERNAME-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{username_key}=#{username_value}", "NAME=#{container_name}"] }
 
           it 'should inject the username environment variable' do
             subject.create(guid)
@@ -371,7 +371,7 @@ describe DockerManager do
 
         context 'with a password key' do
           let(:password_key) { 'PASSWORD-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{password_key}=#{password_value}", "NAME=#{container_name}"] }
 
           it 'should inject the password environment variable' do
             subject.create(guid)
@@ -380,7 +380,7 @@ describe DockerManager do
 
         context 'with a dbname key' do
           let(:dbname_key) { 'DBNAME-KEY' }
-          let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}"] }
+          let(:env_vars) { ['USER=MY-USER', "#{dbname_key}=#{dbname_value}", "NAME=#{container_name}"] }
 
           it 'should inject the dbname environment variable' do
             subject.create(guid)
@@ -465,7 +465,7 @@ describe DockerManager do
 
       context 'when there are service arbitrary parameters' do
         let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
-        let(:env_vars) { ['USER=MY-USER', 'foo=bar', 'bar=foo'] }
+        let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}", 'foo=bar', 'bar=foo'] }
 
         it 'should pass the arbitrary parameters as environment variables' do
           expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
