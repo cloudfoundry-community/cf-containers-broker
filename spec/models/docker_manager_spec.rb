@@ -484,6 +484,19 @@ describe DockerManager do
         end
       end
 
+      context 'when badly configured Settings.container_env_var_dir' do
+        before do
+          expect(Settings).to receive(:container_env_var_dir).and_return("/path/not/exists")
+        end
+
+        it 'should not fail if Settings.container_env_var_dir does not exist' do
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
       context 'when there are service arbitrary parameters' do
         let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
         let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}", 'foo=bar', 'bar=foo'] }
