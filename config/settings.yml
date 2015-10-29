@@ -18,6 +18,7 @@ defaults: &defaults
   host_directory: '/var/vcap/store/cf-containers-broker/'
   max_containers: 0
   allocate_docker_host_ports: true
+  container_env_var_dir: '/var/vcap/store/cf-containers-broker/envdir'
 
   services:
     - id: '2fd814ac-d1f7-4d4a-a4f7-d386cd8fd8e3'

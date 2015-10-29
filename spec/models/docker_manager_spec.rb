@@ -463,6 +463,27 @@ describe DockerManager do
         end
       end
 
+      context 'when there are container env vars in files' do
+        let(:tmp_envdir) { "/tmp/container_env_var_dir" }
+        let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}", 'lower_case=lower-value', 'UPPER_CASE=1234'] }
+
+        before do
+          FileUtils.rm_rf(tmp_envdir)
+          FileUtils.mkdir_p(tmp_envdir)
+          expect(Settings).to receive(:container_env_var_dir).and_return(tmp_envdir)
+        end
+
+        it 'should load files into container env vars' do
+          File.open(File.join(tmp_envdir, "lower_case"), "w") { |f| f << "lower-value\n" }
+          File.open(File.join(tmp_envdir, "UPPER_CASE"), "w") { |f| f << "1234" }
+
+          expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
+          expect(container).to receive(:start).with(container_start_opts)
+          expect(container).to receive(:json).and_return(container_state)
+          subject.create(guid)
+        end
+      end
+
       context 'when there are service arbitrary parameters' do
         let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
         let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}", 'foo=bar', 'bar=foo'] }
