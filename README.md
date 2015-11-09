@@ -117,14 +117,11 @@ Add the service broker to Cloud Foundry as described by [the service broker docu
 A quick way to register the service broker and to enable all service offerings is running:
 
 ```
-cf create-service-broker docker-broker containers containers http://cf-containers-broker.<YOUR CF SYSTEM DOMAIN>
+cf create-service-broker docker-broker containers containers http://<BROKER IP ADDRESS>
 for p in $(cf service-access | tail -n +3 | sed 's/^ *//' | cut -f1 -d' ' | sort | uniq); do
 	cf enable-service-access $p
 done
 ```
-
-Note that the route to your service broker is registered after all images have been downloaded, and this happens before the broker is started, so depending on the number of images to fetch from the registry, the broker can take a long time to be started and registered.
-The route can be configured using the `external_host` property (see [SETTINGS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md) for more details).
 
 ### Bindings
 

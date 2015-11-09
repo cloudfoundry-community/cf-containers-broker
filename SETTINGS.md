@@ -46,25 +46,13 @@ file according to your environment.
     <td>external_ip</td>
     <td>Y</td>
     <td>String</td>
-    <td>IP to use when registering the service broker.</td>
+    <td>Broker external IP address</td>
   </tr>
   <tr>
     <td>external_host</td>
     <td>Y</td>
     <td>String</td>
-    <td>Hostname to use when registering the service broker.</td>
-  </tr>
-  <tr>
-    <td>external_port</td>
-    <td>Y</td>
-    <td>String</td>
-    <td>Port to use when registering the service broker.</td>
-  </tr>
-  <tr>
-    <td>component_name</td>
-    <td>Y</td>
-    <td>String</td>
-    <td>Component name to use when registering the service broker.</td>
+    <td>Hostname to use when exposing the dashboard url.</td>
   </tr>
   <tr>
     <td>ssl_enabled</td>
@@ -97,12 +85,6 @@ file according to your environment.
     <td>N</td>
     <td>Boolean</td>
     <td>Allocate automatically host ports when binding a Docker container. This is useful in order to preserve the container exposed host ports in case of a VM restart.</td>
-  </tr>
-  <tr>
-    <td>message_bus_servers</td>
-    <td>Y</td>
-    <td>Array of Strings</td>
-    <td>NATS servers (format: nats://&lt;nats-user:nats-password@&gt;nats-address:nats-port)).</td>
   </tr>
   <tr>
     <td>services</td>
