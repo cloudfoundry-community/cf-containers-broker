@@ -41,6 +41,9 @@ CfContainersBroker::Application.configure do
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
   config.lograge.enabled = true
 
+  # Use default logging formatter so that PID and timestamp are not suppressed.
+  # config.log_formatter = ::Logger::Formatter.new
+
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
 
@@ -61,6 +64,4 @@ CfContainersBroker::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
 end
