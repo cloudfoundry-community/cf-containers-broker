@@ -35,7 +35,8 @@ CfContainersBroker::Application.configure do
   config.log_level = :info
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  # 1. service instance ID
+  config.log_tags = [ lambda { |r| if r.env['REQUEST_PATH'] =~ %r{/service_instances/([^/]+)}; $1; else $1; end } ]
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
