@@ -35,10 +35,15 @@ CfContainersBroker::Application.configure do
   config.log_level = :info
 
   # Prepend all log lines with the following tags.
-  # config.log_tags = [ :subdomain, :uuid ]
+  # 1. service instance ID
+  config.log_tags = [ lambda { |r| if r.env['REQUEST_PATH'] =~ %r{/service_instances/([^/]+)}; $1; else $1; end } ]
 
   # Use a different logger for distributed setups.
   # config.logger = ActiveSupport::TaggedLogging.new(SyslogLogger.new)
+  config.lograge.enabled = true
+
+  # Use default logging formatter so that PID and timestamp are not suppressed.
+  # config.log_formatter = ::Logger::Formatter.new
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -60,6 +65,4 @@ CfContainersBroker::Application.configure do
   # Disable automatic flushing of the log to improve performance.
   # config.autoflush_log = false
 
-  # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
 end

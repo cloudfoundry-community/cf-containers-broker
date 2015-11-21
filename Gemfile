@@ -8,8 +8,10 @@ gem 'nats'
 gem 'sass-rails'
 gem 'docker-api'
 
+
 group :production do
   gem 'unicorn'
+  gem 'lograge'
 end
 
 group :development, :test do
