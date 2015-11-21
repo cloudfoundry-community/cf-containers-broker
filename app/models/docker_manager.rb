@@ -356,7 +356,13 @@ class DockerManager < ContainerManager
   end
 
   def build_container_envvar(guid)
-    ["NAME=#{container_name(guid)}"]
+    base = ["NAME=#{container_name(guid)}"]
+    Dir[File.join(Settings.container_env_var_dir, "*")].each do |env_var_file|
+      env_var_name = File.basename(env_var_file)
+      env_var_value = File.read(env_var_file).strip
+      base << "#{env_var_name}=#{env_var_value}"
+    end
+    base
   end
 
   def build_parameters_envvars(parameters = {})
