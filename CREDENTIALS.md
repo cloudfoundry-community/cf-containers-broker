@@ -1,6 +1,6 @@
 # Credentials
 
-Each service `plan` defined at the [settings](https://github.com/cloudfoundry-community/cloudfoundry-community/blob/master/SETTINGS.md)
+Each service `plan` defined at the [settings](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md)
 file can have a single set of credentials. Credentials can be predefined (statically defined in the container or at
 the [settings](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md) file), or generated
 randomly and injected into the container at provision/bind time.
