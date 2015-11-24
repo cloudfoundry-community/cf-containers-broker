@@ -5,13 +5,13 @@
 This is a generic `Containers` broker for the Cloud Foundry [v2 services API](http://docs.cloudfoundry.org/services/api.html).
 
 This service broker allows users to provision services that runs inside a
-[compatible container backend](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/README.md#prerequisites)
+[compatible container backend](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/README.md#prerequisites)
 and bind applications to the service. The management tasks that the broker can perform are:
 
  * Provision a service container with random credentials and service arbitrary parameters
  * Bind a service container to an application:
-    * Expose the credentials to access the provisioned service (see [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md) for details)
-    * Provide a syslog drain service for your application logs (see [SYSLOG_DRAIN.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SYSLOG_DRAIN.md) for details)
+    * Expose the credentials to access the provisioned service (see [CREDENTIALS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/CREDENTIALS.md) for details)
+    * Provide a syslog drain service for your application logs (see [SYSLOG_DRAIN.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SYSLOG_DRAIN.md) for details)
  * Unbind a service container from an application
  * Unprovision a service container
  * Expose a service container management dashboard
@@ -31,11 +31,11 @@ This service broker does not include any container backend. Instead, it is meant
 compatible container backend, which it manages:
 
  * [Docker](https://www.docker.com/): Instructions to configure the service broker with a Docker backend can be found
-  at [DOCKER.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/DOCKER.md).
+  at [DOCKER.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/DOCKER.md).
 
 ### Configuration
 
-Configure the application settings according to the instructions found at [SETTINGS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md).
+Configure the application settings according to the instructions found at [SETTINGS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md).
 
 ### Run
 
@@ -58,7 +58,7 @@ This step is optional, you can use the already built Docker image located at the
 [Docker Hub Registry](https://registry.hub.docker.com/u/frodenas/cf-containers-broker/).
 
 If you want to create locally the image `frodenas/cf-containers-broker`
-([Dockerfile](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/Dockerfile)) execute the following
+([Dockerfile](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/Dockerfile)) execute the following
 command on a local cloned `cf-containers-broker` repository:
 
 ```
@@ -108,7 +108,7 @@ docker run -d --name cf-containers-broker \
 
 This service broker can be deployed alongside:
 
-* [Docker CF-BOSH release](https://github.com/cf-platform-eng/docker-boshrelease) if you plan to use Docker as backend.
+* [Docker CF-BOSH release](https://github.com/cloudfoundry-community/docker-boshrelease) if you plan to use Docker as backend.
 
 ### Enable the service broker at your Cloud Foundry environment
 
@@ -145,7 +145,7 @@ otherwise the binding will not contain a port.
 In the example above, the container exposed internal ports `8080` and `8081`, and it was bound to port `61234` on the
 host machine `10.11.12.13` because the `credentials.uri.port` property was set to `8080/tcp`.
 
-For more details, see the [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md) file.
+For more details, see the [CREDENTIALS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/CREDENTIALS.md) file.
 
 ### Tests
 
@@ -172,13 +172,13 @@ Here are some ways *you* can contribute:
 * by writing specifications
 * by writing code (**no patch is too small**: fix typos, add comments, clean up inconsistent whitespace)
 * by refactoring code
-* by closing [issues](https://github.com/cf-platform-eng/cf-containers-broker/issues)
+* by closing [issues](https://github.com/cloudfoundry-community/cf-containers-broker/issues)
 * by reviewing patches
 
 
 ### Submitting an Issue
 
-We use the [GitHub issue tracker](https://github.com/cf-platform-eng/cf-containers-broker/issues) to track bugs and
+We use the [GitHub issue tracker](https://github.com/cloudfoundry-community/cf-containers-broker/issues) to track bugs and
 features. Before submitting a bug report or feature request, check to make sure it hasn't already been submitted. You
 can indicate support for an existing issue by voting it up. When submitting a bug report, please include a
 [Gist](http://gist.github.com/) that includes a stack trace and any details that may be necessary to reproduce the bug,
@@ -195,5 +195,5 @@ with failing specs.
 
 ## Copyright
 
-See [LICENSE](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/LICENSE) for details.
+See [LICENSE](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/LICENSE) for details.
 Copyright (c) 2014 [Pivotal Software, Inc](http://www.gopivotal.com/).

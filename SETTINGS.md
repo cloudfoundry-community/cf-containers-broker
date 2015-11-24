@@ -1,6 +1,6 @@
 # Settings
 
-To configure the service broker update the [config/settings.yml](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/config/settings.yml)
+To configure the service broker update the [config/settings.yml](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/config/settings.yml)
 file according to your environment.
 
 ## Properties format

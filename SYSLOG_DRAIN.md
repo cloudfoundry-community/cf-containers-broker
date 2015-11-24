@@ -1,6 +1,6 @@
 # Syslog Drain
 
-Each service `plan` defined at the [settings](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md)
+Each service `plan` defined at the [settings](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md)
 file can have a single syslog drain. If defined, Cloud Foundry would drain events and logs to the service for the
 bound applications.
 
@@ -9,7 +9,7 @@ permission is required for events and logs to be automatically wired to applicat
 
 ## Properties format
 
-Each service `plan` defined at the [settings](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md)
+Each service `plan` defined at the [settings](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md)
 file might contain the following properties:
 
 <table>
