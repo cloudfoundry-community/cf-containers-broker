@@ -9,10 +9,10 @@ perform actions against Docker. It supports:
 * Injecting service arbitrary parameters into the Docker container via environment variables on provision time.
 * Creating random usernames, passwords and dbnames when binding an application to the service. Those credentials are
 sent to the Docker container via environment variables, so the Docker image must support those variables in order to
-create the right username/password and dbname (see [CREDENTIALS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/CREDENTIALS.md)
+create the right username/password and dbname (see [CREDENTIALS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/CREDENTIALS.md)
 for details).
 * Exposing a container port where the bound applications can drain their logs
-(see [SYSLOG_DRAIN.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SYSLOG_DRAIN.md)
+(see [SYSLOG_DRAIN.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SYSLOG_DRAIN.md)
 for details).
 * Destroying Docker containers when the broker unprovisions a service.
 * Exposing a Management Dashboard with Docker container information, top processes running inside the container,
@@ -46,7 +46,7 @@ docker run -d --name cf-containers-broker \
 
 ## Properties format
 
-Each service `plan` defined at the [settings](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md) file must contain the following properties:
+Each service `plan` defined at the [settings](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md) file must contain the following properties:
 
 <table>
   <tr>
@@ -172,7 +172,7 @@ Each service `plan` defined at the [settings](https://github.com/cf-platform-eng
   </tr>
 </table>
 
-[1] See [SETTINGS.md](https://github.com/cf-platform-eng/cf-containers-broker/blob/master/SETTINGS.md)
+[1] See [SETTINGS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/SETTINGS.md)
 [2] See the Docker builder [EXPOSE](https://docs.docker.com/reference/builder/#expose) instruction
 
 ## Example
