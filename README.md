@@ -118,9 +118,9 @@ A quick way to register the service broker and to enable all service offerings i
 
 ```
 cf create-service-broker docker-broker containers containers http://<BROKER IP ADDRESS>
-for p in $(cf service-access | tail -n +3 | sed 's/^ *//' | cut -f1 -d' ' | sort | uniq); do
-	cf enable-service-access $p
-done
+while read p __; do
+    cf enable-service-access "$p";
+done < <(cf service-access | awk '/orgs/{y=1;next}y && NF' | sort | uniq)
 ```
 
 ### Bindings
