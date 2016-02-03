@@ -50,11 +50,11 @@ defaults: &defaults
             persistent_volumes:
               - '/data'
           credentials:
-            user:
+            username:
               key: 'POSTGRES_USERNAME'
             password:
               key: 'POSTGRES_PASSWORD'
-            db:
+            dbname:
               key: 'POSTGRES_DBNAME'
             uri:
               prefix: 'postgres'
