@@ -56,6 +56,9 @@ defaults: &defaults
               key: 'POSTGRES_PASSWORD'
             dbname:
               key: 'POSTGRES_DBNAME'
+            hostname:
+              key: 'POSTGRES_HOSTNAME'
+              value: 'host-01.docker.com'
             uri:
               prefix: 'postgres'
           description: 'Free Trial'
