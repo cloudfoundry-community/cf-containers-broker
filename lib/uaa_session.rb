@@ -30,6 +30,7 @@ class UaaSession
         service.dashboard_client['id'],
         service.dashboard_client['secret'],
         token_target: Configuration.token_server_url,
+        skip_ssl_validation: Settings.skip_ssl_validation,
       )
       client.refresh_token_grant(refresh_token)
     end

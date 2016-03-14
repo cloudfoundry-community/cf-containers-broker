@@ -66,8 +66,12 @@ module Manage
     end
 
     def ensure_all_necessary_scopes_are_approved
-      token_hash = CF::UAA::TokenCoder.decode(@uaa_session.access_token, verify: false)
-      return true if has_necessary_scopes?(token_hash)
+      begin
+        token_hash = CF::UAA::TokenCoder.decode(@uaa_session.access_token, verify: false)
+        return true if has_necessary_scopes?(token_hash)
+      rescue
+        need_to_retry = true
+      end
 
       if need_to_retry?
         session[:has_retried] = 'true'

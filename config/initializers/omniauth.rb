@@ -13,6 +13,7 @@ unless Rails.env.assets?
     env['omniauth.strategy'].options[:auth_server_url] = Configuration.auth_server_url
     env['omniauth.strategy'].options[:token_server_url] = Configuration.token_server_url
     env['omniauth.strategy'].options[:scope] = %w(cloud_controller_service_permissions.read openid)
+    env['omniauth.strategy'].options[:skip_ssl_validation] = Settings.skip_ssl_validation
   end
 
   Rails.application.config.middleware.use OmniAuth::Builder do
