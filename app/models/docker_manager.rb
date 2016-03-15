@@ -118,7 +118,7 @@ class DockerManager < ContainerManager
   def fetch_image
     Rails.logger.info("Fetching Docker image `#{image}:#{tag}'...")
     begin
-      Docker::Image.create('fromImage' => image, 'tag' => tag)
+      Docker::Image.create('fromImage' => "#{image}:#{tag}")
     rescue Exception => e
       Rails.logger.error("+-> Cannot fetch Docker image `#{image}:#{tag}': #{e.inspect}")
       raise Exceptions::BackendError, "Cannot fetch Docker image `#{image}:#{tag}"

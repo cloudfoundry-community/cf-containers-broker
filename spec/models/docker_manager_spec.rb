@@ -581,14 +581,14 @@ describe DockerManager do
 
   describe '#fetch_image' do
     it 'should fetch the image' do
-      expect(Docker::Image).to receive(:create).with('fromImage' => 'my-image', 'tag' => 'latest')
+      expect(Docker::Image).to receive(:create).with('fromImage' => 'my-image:latest')
       subject.fetch_image
     end
 
     context 'when it cannot fetch the image' do
       it 'should raise an Exception' do
         expect(Docker::Image).to receive(:create)
-                                 .with('fromImage' => 'my-image', 'tag' => 'latest')
+                                 .with('fromImage' => 'my-image:latest')
                                  .and_raise(Exceptions::NotFound)
         expect do
           subject.fetch_image
