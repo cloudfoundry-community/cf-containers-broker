@@ -280,7 +280,7 @@ class DockerManager < ContainerManager
       'Cmd' => command.split(' '),
       'Entrypoint' => entrypoint,
       'Image' => "#{image.strip}:#{tag.strip}",
-      'Labels' => {'plan_id' => plan_id},
+      'Labels' => {'plan_id' => plan_id, 'instance_id' => guid},
       'Volumes' => {},
       'WorkingDir' => workdir,
       'NetworkDisabled' => false,

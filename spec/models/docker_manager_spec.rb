@@ -284,7 +284,7 @@ describe DockerManager do
         'Cmd' => ['command1', 'command2'],
         'Entrypoint' => ['/bin/bash'],
         'Image' => 'my-image:latest',
-        'Labels' => {'plan_id' => 'plan_id'},
+        'Labels' => {'plan_id' => 'plan_id', 'instance_id' => guid},
         'Volumes' => {},
         'WorkingDir' => 'my-wordkdir',
         'NetworkDisabled' => false,
