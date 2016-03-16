@@ -62,7 +62,8 @@ class Plan
 
     container_attrs = attrs.merge('credentials' => credentials,
                                   'syslog_drain_port' => syslog_drain_port,
-                                  'syslog_drain_protocol' => syslog_drain_protocol)
+                                  'syslog_drain_protocol' => syslog_drain_protocol,
+                                  'plan_id' => id)
     Class.const_get("#{container_backend.capitalize}Manager").new(container_attrs)
   end
 end

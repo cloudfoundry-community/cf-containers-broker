@@ -7,6 +7,7 @@ describe DockerManager do
   let(:subject) { described_class.new(attrs) }
   let(:attrs) do
     {
+      'plan_id' => 'plan_id',
       'backend' => 'docker',
       'image' => 'my-image',
       'tag' => 'latest',
@@ -101,7 +102,7 @@ describe DockerManager do
     context 'when mandatory keys are missing' do
       it 'should raise a Exceptions::ArgumentError exception' do
         expect do
-          described_class.new({ 'backend' => 'docker' })
+          described_class.new({ 'backend' => 'docker', 'plan_id' => 'plan_id'})
         end.to raise_error Exceptions::ArgumentError, 'Missing Docker parameters: image'
       end
     end
@@ -111,6 +112,7 @@ describe DockerManager do
         {
           'backend'=> 'docker',
           'image' => 'my-image',
+          'plan_id' => 'plan_id',
         }
       end
 
@@ -282,7 +284,7 @@ describe DockerManager do
         'Cmd' => ['command1', 'command2'],
         'Entrypoint' => ['/bin/bash'],
         'Image' => 'my-image:latest',
-        'Labels' => {},
+        'Labels' => {'plan_id' => 'plan_id'},
         'Volumes' => {},
         'WorkingDir' => 'my-wordkdir',
         'NetworkDisabled' => false,

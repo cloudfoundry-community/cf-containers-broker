@@ -10,7 +10,7 @@ class DockerManager < ContainerManager
 
   MIN_SUPPORTED_DOCKER_API_VERSION = '1.13'
 
-  attr_reader :host_port_allocator, :image, :tag, :command, :entrypoint, :restart, :workdir,
+  attr_reader :host_port_allocator, :plan_id, :image, :tag, :command, :entrypoint, :restart, :workdir,
               :environment, :expose_ports, :persistent_volumes, :user, :memory, :memory_swap,
               :cpu_shares, :privileged, :cap_adds, :cap_drops
 
@@ -20,6 +20,7 @@ class DockerManager < ContainerManager
     validate_docker_remote_api
     @host_port_allocator = DockerHostPortAllocator.instance
 
+    @plan_id = attrs.fetch('plan_id')
     @image = attrs.fetch('image')
     @tag = attrs.fetch('tag', 'latest') || 'latest'
     @command = attrs.fetch('command', '')
@@ -233,7 +234,7 @@ class DockerManager < ContainerManager
   private
 
   def validate_docker_attrs(attrs)
-    required_keys = %w(image)
+    required_keys = %w(image plan_id)
     missing_keys = []
 
     required_keys.each do |key|
@@ -279,7 +280,7 @@ class DockerManager < ContainerManager
       'Cmd' => command.split(' '),
       'Entrypoint' => entrypoint,
       'Image' => "#{image.strip}:#{tag.strip}",
-      'Labels' => {},
+      'Labels' => {'plan_id' => plan_id},
       'Volumes' => {},
       'WorkingDir' => workdir,
       'NetworkDisabled' => false,
