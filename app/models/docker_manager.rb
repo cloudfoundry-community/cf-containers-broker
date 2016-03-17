@@ -126,6 +126,16 @@ class DockerManager < ContainerManager
     end
   end
 
+  def update_containers_to_latest_image
+    image_id = Docker::Image.get("#{image}:#{tag}").id
+    all_containers.each do |container|
+      handle = Docker::Container.get(container.id)
+      if handle.info['Image'] != image_id
+        update(handle.info['Config']['Labels']['instance_id'], envvars_from_container(handle))
+      end
+    end
+  end
+
   def service_credentials(guid)
     Rails.logger.info("Building credentials hash for container `#{container_name(guid)}'...")
     if container = find(guid)
@@ -260,6 +270,10 @@ class DockerManager < ContainerManager
     raise Exceptions::BackendError, "Unable to connect to the Docker Remote API `#{Docker.url}': #{e.message}"
   end
 
+  def all_containers
+    Docker::Container.all(filters: {label: ["plan_id=#{plan_id}"]}.to_json)
+  end
+
   def container_running?(container)
     container.json.fetch('State', {}).fetch('Running', false)
   end
@@ -370,6 +384,14 @@ class DockerManager < ContainerManager
     parameters.map do |key, value|
       "#{key.to_s}=#{value.to_s}"
     end.compact
+  end
+
+  def envvars_from_container(container_handle)
+    container_handle.info["Config"]["Env"].reduce({}) do |map, var|
+      k, v = var.split("=")
+      map[k]=v
+      map
+    end
   end
 
   def start_options(guid)

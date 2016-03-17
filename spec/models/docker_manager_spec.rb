@@ -599,6 +599,37 @@ describe DockerManager do
     end
   end
 
+  describe '#update_containers_to_latest_image' do
+    let(:image) { double('image', id: 'image-id') }
+    let(:containers) { [ double('c1', id: 'c1'), double('c2', id: 'c2')] }
+
+    before do
+      allow(Docker::Image).to receive(:get).with('my-image:latest') { image }
+      allow(Docker::Container).to receive(:all) { containers }
+    end
+
+    it 'calls update for containers that have a different image id' do
+      old_image_info = {
+        'Image' => 'old-image-id',
+        'Config' => {
+          'Labels' => { 'instance_id' => 'instance-id' },
+          'Env' => ['VAR1=foo', 'VAR2=bar']}}
+
+      up_to_date_image_info = { "Image" => 'image-id' }
+
+      old_handle = double('h1', info: old_image_info)
+      up_to_date_handle = double('h2', info: up_to_date_image_info)
+
+      expect(Docker::Container).to receive(:get).with('c1') { old_handle }
+      expect(Docker::Container).to receive(:get).with('c2') { up_to_date_handle }
+
+      expect(subject).to receive(:update).with(
+        'instance-id', {"VAR1" => 'foo', 'VAR2' => 'bar'})
+
+      subject.update_containers_to_latest_image
+    end
+  end
+
   describe '#service_credentials' do
     # TODO
   end
