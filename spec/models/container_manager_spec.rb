@@ -100,6 +100,14 @@ describe ContainerManager do
     end
   end
 
+  describe '#update_containers_to_latest_image' do
+    it 'should raise a NotImplemented Exception' do
+      expect do
+        subject.update_containers_to_latest_image
+      end.to raise_error(Exceptions::NotImplemented, "`update_containers_to_latest_image' is not implemented by `#{subject.class.name}'")
+    end
+  end
+
   describe '#service_credentials' do
     it 'should raise a NotImplemented Exception' do
       expect do
