@@ -129,9 +129,9 @@ class DockerManager < ContainerManager
   def update_containers_to_latest_image
     image_id = Docker::Image.get("#{image}:#{tag}").id
     all_containers.each do |container|
-      handle = Docker::Container.get(container.id)
-      if handle.info['Image'] != image_id
-        update(handle.info['Config']['Labels']['instance_id'], envvars_from_container(handle))
+      if container.info['Image'] != image_id
+        update(container.info['Config']['Labels']['instance_id'],
+               envvars_from_container(container))
       end
     end
   end
@@ -271,7 +271,10 @@ class DockerManager < ContainerManager
   end
 
   def all_containers
-    Docker::Container.all(filters: {label: ["plan_id=#{plan_id}"]}.to_json)
+    filters = {label: ["plan_id=#{plan_id}"]}.to_json
+    Docker::Container.all(filters: filters).map do |container|
+        Docker::Container.get(container.id)
+      end
   end
 
   def container_running?(container)
@@ -386,8 +389,8 @@ class DockerManager < ContainerManager
     end.compact
   end
 
-  def envvars_from_container(container_handle)
-    container_handle.info["Config"]["Env"].reduce({}) do |map, var|
+  def envvars_from_container(container)
+    container.info["Config"]["Env"].reduce({}) do |map, var|
       k, v = var.split("=")
       map[k]=v
       map
