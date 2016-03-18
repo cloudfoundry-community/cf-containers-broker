@@ -142,10 +142,23 @@ otherwise the binding will not contain a port.
 { "host": "10.11.12.13", "port": 61234, "ports": ["8080/tcp": 61234, "8081/tcp": 61235] }
 ```
 
+
+
+
 In the example above, the container exposed internal ports `8080` and `8081`, and it was bound to port `61234` on the
 host machine `10.11.12.13` because the `credentials.uri.port` property was set to `8080/tcp`.
 
 For more details, see the [CREDENTIALS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/CREDENTIALS.md) file.
+
+### Updating Containers
+
+When new images become available or configuration of the plans change it can become desirable to restart the running containers to pick up the latest version of their image and/or update their configuration.
+
+`bin/update_all_containers` will attempt to find all running containers managed by the broker and restart them with the latest configuration.
+
+The mapping between running containers and configured plans is achieved by adding the labels `plan_id` and `instance_id` to the containers at create time. Containers that don't have these labels will be ignored by the update script.
+
+If you are updating cf-containers-broker from an older version that didn't add the required labels you can force the broker to recreate the containers via `cf update-service <service-id>`. After this the labels will be available and the `bin/update_all_containers` script will be able to identify the containers for automatic updating.
 
 ### Tests
 
