@@ -599,54 +599,46 @@ describe DockerManager do
     end
   end
 
-  describe '#update_containers_to_latest_image' do
-    let(:image) { double('image', id: 'image-id') }
+  describe '#update_all_containers' do
     let(:containers) { [ double('c1', id: 'c1'), double('c2', id: 'c2')] }
-    let(:up_to_date_container) do
-      double('container', info: { 'Image' => 'image-id'})
+    let(:container1_info) do
+      old_image_info = { 'Config' => {
+        'Labels' => { 'instance_id' => 'instance-id1' }, 'Env' => []}}
     end
+    let(:container2_info) do
+      old_image_info = { 'Config' => {
+        'Labels' => { 'instance_id' => 'instance-id2' }, 'Env' => []}}
+    end
+    let(:container1) { double('container1', info: container1_info) }
+    let(:container2) { double('container2', info: container2_info) }
 
     before do
-      allow(Docker::Image).to receive(:get).with('my-image:latest') { image }
       allow(Docker::Container).to receive(:all) { containers }
-
-      allow(Docker::Container).to receive(:get).with('c1') { up_to_date_container }
-      allow(Docker::Container).to receive(:get).with('c2') { up_to_date_container }
+      allow(Docker::Container).to receive(:get).with('c1') { container1 }
+      allow(Docker::Container).to receive(:get).with('c2') { container2 }
     end
 
-    it 'calls update for containers that have a different image id' do
-      old_image_info = {
-        'Image' => 'old-image-id',
-        'Config' => {
-          'Labels' => { 'instance_id' => 'instance-id' },
-          'Env' => []}}
+    it 'calls update for each container' do
+      expect(subject).to receive(:update).with('instance-id1', {})
+      expect(subject).to receive(:update).with('instance-id2', {})
 
-       old_container = double('old-container', info: old_image_info)
-
-      allow(Docker::Container).to receive(:get).with('c1') { old_container }
-
-      expect(subject).to receive(:update).with('instance-id', {})
-
-      subject.update_containers_to_latest_image
+      subject.update_all_containers
     end
 
     it 'preserves environment variables that are not provided via plan attrs' do
       provided_var = 'USER=USER'
       not_provided_var = 'FOO=BAR'
-      old_image_info = {
-        'Image' => 'old-image-id',
+      info_with_env_vars = {
         'Config' => {
-          'Labels' => { 'instance_id' => 'instance-id' },
+          'Labels' => { 'instance_id' => 'instance-id1' },
           'Env' => [provided_var, not_provided_var]}}
 
-      old_container = double('old-container', info: old_image_info)
+      allow(container1).to receive(:info) { info_with_env_vars }
 
-      allow(Docker::Container).to receive(:get).with('c1') { old_container }
+      expect(subject).to receive(:update).with('instance-id1', {'FOO' => 'BAR'})
+      expect(subject).to receive(:update).with('instance-id2', {})
 
-      expect(subject).to receive(:update).with(
-        'instance-id', {'FOO' => 'BAR'})
-
-      subject.update_containers_to_latest_image
+      subject.update_all_containers
     end
   end
 

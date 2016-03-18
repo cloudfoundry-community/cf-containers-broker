@@ -126,14 +126,11 @@ class DockerManager < ContainerManager
     end
   end
 
-  def update_containers_to_latest_image
-    image_id = Docker::Image.get("#{image}:#{tag}").id
+  def update_all_containers
     all_containers.each do |container|
-      if container.info['Image'] != image_id
-        guid = container.info['Config']['Labels']['instance_id']
-        excluded_vars = env_vars(guid).map { |var| var.split('=').first }
-        update(guid, envvars_from_container(container, excluded_vars))
-      end
+      guid = container.info['Config']['Labels']['instance_id']
+      excluded_vars = env_vars(guid).map { |var| var.split('=').first }
+      update(guid, envvars_from_container(container, excluded_vars))
     end
   end
 
