@@ -37,8 +37,8 @@ class ContainerManager
     raise Exceptions::NotImplemented, "`fetch_image' is not implemented by `#{self.class}'"
   end
 
-  def update_containers_to_latest_image
-    raise Exceptions::NotImplemented, "`update_containers_to_latest_image' is not implemented by `#{self.class}'"
+  def update_all_containers
+    raise Exceptions::NotImplemented, "`update_all_containers' is not implemented by `#{self.class}'"
   end
 
   def service_credentials(guid)
