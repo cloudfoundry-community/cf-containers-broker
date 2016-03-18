@@ -271,8 +271,8 @@ class DockerManager < ContainerManager
   def all_containers
     filters = {label: ["plan_id=#{plan_id}"]}.to_json
     Docker::Container.all(filters: filters).map do |container|
-        Docker::Container.get(container.id)
-      end
+      Docker::Container.get(container.id)
+    end
   end
 
   def container_running?(container)
