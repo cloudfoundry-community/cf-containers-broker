@@ -158,7 +158,9 @@ When new images become available or configuration of the plans change it can bec
 
 The mapping between running containers and configured plans is achieved by adding the labels `plan_id` and `instance_id` to the containers at create time. Containers that don't have these labels will be ignored by the update script.
 
-If you are updating cf-containers-broker from an older version that didn't add the required labels you can force the broker to recreate the containers via `cf update-service <service-id>`. After this the labels will be available and the `bin/update_all_containers` script will be able to identify the containers for automatic updating. In order for `cf update-service <service-id>` the service must declare `plan_updateable: true`.
+If you are updating cf-containers-broker from an older version that didn't add the required labels you can force the broker to recreate the containers via `cf update-service <service-id>`. After this the labels will be available and the `bin/update_all_containers` script will be able to identify the containers for automatic updating. 
+
+In order for `cf update-service <service-id>` to work the service must declare `plan_updateable: true`.
 
 
 ### Tests
