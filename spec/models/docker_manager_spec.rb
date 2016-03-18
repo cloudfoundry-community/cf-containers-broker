@@ -7,6 +7,7 @@ describe DockerManager do
   let(:subject) { described_class.new(attrs) }
   let(:attrs) do
     {
+      'plan_id' => 'plan_id',
       'backend' => 'docker',
       'image' => 'my-image',
       'tag' => 'latest',
@@ -101,7 +102,7 @@ describe DockerManager do
     context 'when mandatory keys are missing' do
       it 'should raise a Exceptions::ArgumentError exception' do
         expect do
-          described_class.new({ 'backend' => 'docker' })
+          described_class.new({ 'backend' => 'docker', 'plan_id' => 'plan_id'})
         end.to raise_error Exceptions::ArgumentError, 'Missing Docker parameters: image'
       end
     end
@@ -111,6 +112,7 @@ describe DockerManager do
         {
           'backend'=> 'docker',
           'image' => 'my-image',
+          'plan_id' => 'plan_id',
         }
       end
 
@@ -282,7 +284,7 @@ describe DockerManager do
         'Cmd' => ['command1', 'command2'],
         'Entrypoint' => ['/bin/bash'],
         'Image' => 'my-image:latest',
-        'Labels' => {},
+        'Labels' => {'plan_id' => 'plan_id', 'instance_id' => guid},
         'Volumes' => {},
         'WorkingDir' => 'my-wordkdir',
         'NetworkDisabled' => false,
@@ -594,6 +596,49 @@ describe DockerManager do
           subject.fetch_image
         end.to raise_error(Exceptions::BackendError, "Cannot fetch Docker image `my-image:latest")
       end
+    end
+  end
+
+  describe '#update_all_containers' do
+    let(:containers) { [ double('c1', id: 'c1'), double('c2', id: 'c2')] }
+    let(:container1_info) do
+      old_image_info = { 'Config' => {
+        'Labels' => { 'instance_id' => 'instance-id1' }, 'Env' => []}}
+    end
+    let(:container2_info) do
+      old_image_info = { 'Config' => {
+        'Labels' => { 'instance_id' => 'instance-id2' }, 'Env' => []}}
+    end
+    let(:container1) { double('container1', info: container1_info) }
+    let(:container2) { double('container2', info: container2_info) }
+
+    before do
+      allow(Docker::Container).to receive(:all) { containers }
+      allow(Docker::Container).to receive(:get).with('c1') { container1 }
+      allow(Docker::Container).to receive(:get).with('c2') { container2 }
+    end
+
+    it 'calls update for each container' do
+      expect(subject).to receive(:update).with('instance-id1', {})
+      expect(subject).to receive(:update).with('instance-id2', {})
+
+      subject.update_all_containers
+    end
+
+    it 'preserves environment variables that are not provided via plan attrs' do
+      provided_var = 'USER=USER'
+      not_provided_var = 'FOO=BAR'
+      info_with_env_vars = {
+        'Config' => {
+          'Labels' => { 'instance_id' => 'instance-id1' },
+          'Env' => [provided_var, not_provided_var]}}
+
+      allow(container1).to receive(:info) { info_with_env_vars }
+
+      expect(subject).to receive(:update).with('instance-id1', {'FOO' => 'BAR'})
+      expect(subject).to receive(:update).with('instance-id2', {})
+
+      subject.update_all_containers
     end
   end
 

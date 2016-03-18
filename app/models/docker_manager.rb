@@ -10,7 +10,7 @@ class DockerManager < ContainerManager
 
   MIN_SUPPORTED_DOCKER_API_VERSION = '1.13'
 
-  attr_reader :host_port_allocator, :image, :tag, :command, :entrypoint, :restart, :workdir,
+  attr_reader :host_port_allocator, :plan_id, :image, :tag, :command, :entrypoint, :restart, :workdir,
               :environment, :expose_ports, :persistent_volumes, :user, :memory, :memory_swap,
               :cpu_shares, :privileged, :cap_adds, :cap_drops
 
@@ -20,6 +20,7 @@ class DockerManager < ContainerManager
     validate_docker_remote_api
     @host_port_allocator = DockerHostPortAllocator.instance
 
+    @plan_id = attrs.fetch('plan_id')
     @image = attrs.fetch('image')
     @tag = attrs.fetch('tag', 'latest') || 'latest'
     @command = attrs.fetch('command', '')
@@ -122,6 +123,14 @@ class DockerManager < ContainerManager
     rescue Exception => e
       Rails.logger.error("+-> Cannot fetch Docker image `#{image}:#{tag}': #{e.inspect}")
       raise Exceptions::BackendError, "Cannot fetch Docker image `#{image}:#{tag}"
+    end
+  end
+
+  def update_all_containers
+    all_containers.each do |container|
+      guid = container.info['Config']['Labels']['instance_id']
+      excluded_vars = env_vars(guid).map { |var| var.split('=').first }
+      update(guid, envvars_from_container(container, excluded_vars))
     end
   end
 
@@ -233,7 +242,7 @@ class DockerManager < ContainerManager
   private
 
   def validate_docker_attrs(attrs)
-    required_keys = %w(image)
+    required_keys = %w(image plan_id)
     missing_keys = []
 
     required_keys.each do |key|
@@ -259,6 +268,13 @@ class DockerManager < ContainerManager
     raise Exceptions::BackendError, "Unable to connect to the Docker Remote API `#{Docker.url}': #{e.message}"
   end
 
+  def all_containers
+    filters = {label: ["plan_id=#{plan_id}"]}.to_json
+    Docker::Container.all(filters: filters).map do |container|
+      Docker::Container.get(container.id)
+    end
+  end
+
   def container_running?(container)
     container.json.fetch('State', {}).fetch('Running', false)
   end
@@ -279,7 +295,7 @@ class DockerManager < ContainerManager
       'Cmd' => command.split(' '),
       'Entrypoint' => entrypoint,
       'Image' => "#{image.strip}:#{tag.strip}",
-      'Labels' => {},
+      'Labels' => {'plan_id' => plan_id, 'instance_id' => guid},
       'Volumes' => {},
       'WorkingDir' => workdir,
       'NetworkDisabled' => false,
@@ -369,6 +385,14 @@ class DockerManager < ContainerManager
     parameters.map do |key, value|
       "#{key.to_s}=#{value.to_s}"
     end.compact
+  end
+
+  def envvars_from_container(container, exclude = [])
+    container.info['Config']['Env'].reduce({}) do |map, var|
+      key, value = var.split('=')
+      map[key] = value unless exclude.include? key
+      map
+    end
   end
 
   def start_options(guid)
