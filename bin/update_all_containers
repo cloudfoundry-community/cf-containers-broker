@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require File.expand_path('../../config/application', __FILE__)
-require 'container_images'
+require 'container_lifecycle'
 
 Rails.logger = Logger.new(STDOUT)
-ContainerImages.update
+ContainerLifecycle.update_all
