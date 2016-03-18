@@ -142,9 +142,6 @@ otherwise the binding will not contain a port.
 { "host": "10.11.12.13", "port": 61234, "ports": ["8080/tcp": 61234, "8081/tcp": 61235] }
 ```
 
-
-
-
 In the example above, the container exposed internal ports `8080` and `8081`, and it was bound to port `61234` on the
 host machine `10.11.12.13` because the `credentials.uri.port` property was set to `8080/tcp`.
 
