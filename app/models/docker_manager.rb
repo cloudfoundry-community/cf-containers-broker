@@ -130,8 +130,9 @@ class DockerManager < ContainerManager
     image_id = Docker::Image.get("#{image}:#{tag}").id
     all_containers.each do |container|
       if container.info['Image'] != image_id
-        update(container.info['Config']['Labels']['instance_id'],
-               envvars_from_container(container))
+        guid = container.info['Config']['Labels']['instance_id']
+        excluded_vars = env_vars(guid).map { |var| var.split('=').first }
+        update(guid, envvars_from_container(container, excluded_vars))
       end
     end
   end
@@ -389,10 +390,10 @@ class DockerManager < ContainerManager
     end.compact
   end
 
-  def envvars_from_container(container)
-    container.info["Config"]["Env"].reduce({}) do |map, var|
-      k, v = var.split("=")
-      map[k]=v
+  def envvars_from_container(container, exclude = [])
+    container.info['Config']['Env'].reduce({}) do |map, var|
+      key, value = var.split('=')
+      map[key] = value unless exclude.include? key
       map
     end
   end

@@ -602,10 +602,16 @@ describe DockerManager do
   describe '#update_containers_to_latest_image' do
     let(:image) { double('image', id: 'image-id') }
     let(:containers) { [ double('c1', id: 'c1'), double('c2', id: 'c2')] }
+    let(:up_to_date_container) do
+      double('container', info: { 'Image' => 'image-id'})
+    end
 
     before do
       allow(Docker::Image).to receive(:get).with('my-image:latest') { image }
       allow(Docker::Container).to receive(:all) { containers }
+
+      allow(Docker::Container).to receive(:get).with('c1') { up_to_date_container }
+      allow(Docker::Container).to receive(:get).with('c2') { up_to_date_container }
     end
 
     it 'calls update for containers that have a different image id' do
@@ -613,18 +619,32 @@ describe DockerManager do
         'Image' => 'old-image-id',
         'Config' => {
           'Labels' => { 'instance_id' => 'instance-id' },
-          'Env' => ['VAR1=foo', 'VAR2=bar']}}
+          'Env' => []}}
 
-      up_to_date_image_info = { "Image" => 'image-id' }
+       old_container = double('old-container', info: old_image_info)
 
-      old_handle = double('h1', info: old_image_info)
-      up_to_date_handle = double('h2', info: up_to_date_image_info)
+      allow(Docker::Container).to receive(:get).with('c1') { old_container }
 
-      expect(Docker::Container).to receive(:get).with('c1') { old_handle }
-      expect(Docker::Container).to receive(:get).with('c2') { up_to_date_handle }
+      expect(subject).to receive(:update).with('instance-id', {})
+
+      subject.update_containers_to_latest_image
+    end
+
+    it 'preserves environment variables that are not provided via plan attrs' do
+      provided_var = 'USER=USER'
+      not_provided_var = 'FOO=BAR'
+      old_image_info = {
+        'Image' => 'old-image-id',
+        'Config' => {
+          'Labels' => { 'instance_id' => 'instance-id' },
+          'Env' => [provided_var, not_provided_var]}}
+
+      old_container = double('old-container', info: old_image_info)
+
+      allow(Docker::Container).to receive(:get).with('c1') { old_container }
 
       expect(subject).to receive(:update).with(
-        'instance-id', {"VAR1" => 'foo', 'VAR2' => 'bar'})
+        'instance-id', {'FOO' => 'BAR'})
 
       subject.update_containers_to_latest_image
     end
