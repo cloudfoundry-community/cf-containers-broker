@@ -117,7 +117,7 @@ Add the service broker to Cloud Foundry as described by [the service broker docu
 A quick way to register the service broker and to enable all service offerings is running:
 
 ```
-cf create-service-broker docker-broker containers containers http://<BROKER IP ADDRESS>
+cf create-service-broker docker-broker containers secret http://<BROKER IP ADDRESS>
 while read p __; do
     cf enable-service-access "$p";
 done < <(cf service-access | awk '/orgs/{y=1;next}y && NF' | sort | uniq)
