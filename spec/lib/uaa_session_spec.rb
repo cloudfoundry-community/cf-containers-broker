@@ -59,7 +59,8 @@ describe UaaSession do
                                         .with(auth_server_url,
                                               dashboard_client_id,
                                               dashboard_client_secret,
-                                              { token_target: token_server_url })
+                                              { token_target: token_server_url,
+                                                skip_ssl_validation: Settings.skip_ssl_validation })
                                         .and_return(token_issuer)
         expect(token_issuer).to receive(:refresh_token_grant)
                                 .with(refresh_token)
