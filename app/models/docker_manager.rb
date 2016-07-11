@@ -86,7 +86,7 @@ class DockerManager < ContainerManager
       raise Exceptions::NotFound, "Docker container `#{container_name(guid)}' not found"
     end
     port_bindings = container.json['HostConfig']['PortBindings']
-    container.kill
+    container.stop
     container.remove(v: true, force: true)
 
     container_create_opts = create_options(guid, parameters)
@@ -108,7 +108,7 @@ class DockerManager < ContainerManager
   def destroy(guid)
     Rails.logger.info("Destroying Docker container `#{container_name(guid)}'...")
     if container = find(guid)
-      container.kill
+      container.stop
       container.remove(v: true, force: true)
       destroy_volumes(guid)
     else

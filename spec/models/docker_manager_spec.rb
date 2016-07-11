@@ -517,11 +517,11 @@ describe DockerManager do
       let(:binds) { ["/tmp/#{container_name}#{persistent_volume}:#{persistent_volume}"] }
       let(:port_bindings) { {"5432/tcp"=>[{"HostIp"=>"", "HostPort"=>"55555"}]} }
 
-      it 'should kill then recreate the container with existing persistent data' do
+      it 'should stop then recreate the container with existing persistent data' do
         expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
         expect(container).to receive(:json).and_return({
           'HostConfig' => {'PortBindings' => port_bindings}})
-        expect(container).to receive(:kill)
+        expect(container).to receive(:stop)
         expect(container).to receive(:remove).with(v: true, force: true)
 
         expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
@@ -549,9 +549,9 @@ describe DockerManager do
   end
 
   describe '#destroy' do
-    it 'should kill and remove the container and delete any persistent data' do
+    it 'should stop and remove the container and delete any persistent data' do
       expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
-      expect(container).to receive(:kill)
+      expect(container).to receive(:stop)
       expect(container).to receive(:remove).with(v: true, force: true)
       expect(Settings).to receive(:host_directory).and_return('/tmp')
       expect(FileUtils).to receive(:remove_entry_secure).with("/tmp/#{container_name}", true)
@@ -572,7 +572,7 @@ describe DockerManager do
 
       it 'should not delete any persistent data' do
         expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
-        expect(container).to receive(:kill)
+        expect(container).to receive(:stop)
         expect(container).to receive(:remove).with(v: true, force: true)
         expect(Settings).to_not receive(:host_directory)
         expect(FileUtils).to_not receive(:remove_entry_secure)
