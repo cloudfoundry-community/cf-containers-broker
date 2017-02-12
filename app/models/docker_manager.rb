@@ -351,7 +351,7 @@ class DockerManager < ContainerManager
     end.compact
   end
 
-  def append_port_binding_envvars(container_create_opts)
+  def append_port_binding_envvars(guid, container_create_opts)
     envvars = container_create_opts["Env"]
     envvars = envvars.delete_if { |envvar| envvar =~ /DOCKER_HOST_PORT/ }
     envvars << build_port_envvar(guid)
