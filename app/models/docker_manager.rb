@@ -78,6 +78,9 @@ class DockerManager < ContainerManager
       destroy_volumes(guid)
       raise Exceptions::BackendError, "Cannot start Docker container `#{container_name(guid)}'"
     end
+
+    # Now restart container so it gets port binding env vars
+    update(guid, parameters)
   end
 
   def update(guid, parameters = {})
@@ -458,9 +461,12 @@ class DockerManager < ContainerManager
 
   def port_bindings(guid)
     if expose_ports.empty?
-      container = find(guid)
-      image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
-      Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
+      if container = find(guid)
+        image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
+        Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
+      else
+        {}
+      end
     else
       Hash[expose_ports.map { |ep| [ep, [ host_port_binding(ep) ]] }]
     end
