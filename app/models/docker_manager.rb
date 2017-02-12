@@ -93,6 +93,7 @@ class DockerManager < ContainerManager
     container.remove(v: true, force: true)
 
     container_create_opts = create_options(guid, parameters)
+    append_port_binding_envvars(guid, container_create_opts)
     Rails.logger.info("+-> Create/update options: #{container_create_opts.inspect}")
     container = Docker::Container.create(container_create_opts)
 
@@ -335,7 +336,6 @@ class DockerManager < ContainerManager
 
   def env_vars(guid, parameters = {})
     ev = build_custom_envvars
-    ev << build_port_envvar(guid)
     ev << build_user_envvar(guid)
     ev << build_password_envvar(guid)
     ev << build_dbname_envvar(guid)
@@ -349,6 +349,13 @@ class DockerManager < ContainerManager
       ev = env_var.split('=')
       "#{ev.first.strip}=#{ev.last.strip}" unless ev.empty?
     end.compact
+  end
+
+  def append_port_binding_envvars(container_create_opts)
+    envvars = container_create_opts["Env"]
+    envvars = envvars.delete_if { |envvar| envvar =~ /DOCKER_HOST_PORT/ }
+    envvars << build_port_envvar(guid)
+    container_create_opts["Env"] = envvars
   end
 
   def build_port_envvar(guid)
