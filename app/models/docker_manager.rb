@@ -354,13 +354,6 @@ class DockerManager < ContainerManager
   def append_port_binding_envvars(guid, container_create_opts)
     envvars = container_create_opts["Env"]
     envvars = envvars.delete_if { |envvar| envvar =~ /DOCKER_HOST_PORT/ }
-    envvars << build_port_envvar(guid)
-    container_create_opts["Env"] = envvars
-  end
-
-  def build_port_envvar(guid)
-    envvars = []
-    # {"1234/tcp"=>[{"HostPort"=>"32768"}]}
     port_bindings(guid).each do |binding|
       container_port_tcp, host_port_hash = binding
       if container_port_tcp =~ /(\d+)\/tcp/
@@ -371,7 +364,7 @@ class DockerManager < ContainerManager
         envvars << "DOCKER_HOST_PORT_#{container_port}=#{host_port}"
       end
     end
-    envvars
+    container_create_opts["Env"] = envvars
   end
 
   def build_user_envvar(guid)
