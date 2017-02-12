@@ -47,6 +47,14 @@ class Credentials
     end
   end
 
+  def hostname_key
+    credentials.fetch('hostname', {}).fetch('key', nil)
+  end
+
+  def hostname_value
+    credentials.fetch('hostname', {}).fetch('value', nil)
+  end
+
   def uri_prefix
     credentials.fetch('uri', {}).fetch('prefix', nil)
   end
@@ -57,6 +65,7 @@ class Credentials
 
   def to_hash(guid, hostname, ports)
     service_credentials = { 'hostname' => hostname }
+    service_credentials['hostname'] = hostname_value if hostname_key
 
     service_credentials['ports'] = ports unless ports.empty?
     if uri_port
