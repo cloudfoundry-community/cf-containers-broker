@@ -332,6 +332,7 @@ class DockerManager < ContainerManager
 
   def env_vars(guid, parameters = {})
     ev = build_custom_envvars
+    ev << build_port_envvar(guid)
     ev << build_user_envvar(guid)
     ev << build_password_envvar(guid)
     ev << build_dbname_envvar(guid)
@@ -345,6 +346,22 @@ class DockerManager < ContainerManager
       ev = env_var.split('=')
       "#{ev.first.strip}=#{ev.last.strip}" unless ev.empty?
     end.compact
+  end
+
+  def build_port_envvar(guid)
+    envvars = []
+    # {"1234/tcp"=>[{"HostPort"=>"32768"}]}
+    port_bindings(guid).each do |binding|
+      container_port_tcp, host_port_hash = binding
+      if container_port_tcp =~ /(\d+)\/tcp/
+        container_port = $1
+        host_port = host_port_hash[0]["HostPort"]
+      end
+      if container_port && host_port
+        envvars << "DOCKER_HOST_PORT_#{container_port}=#{host_port}"
+      end
+    end
+    envvars
   end
 
   def build_user_envvar(guid)
@@ -451,6 +468,7 @@ class DockerManager < ContainerManager
 
   def host_port_binding(port)
     return {} unless Settings['allocate_docker_host_ports']
+    return {} unless port
 
     p = port.split('/')
     protocol = p.last || 'tcp'
