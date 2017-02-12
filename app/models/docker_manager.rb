@@ -80,6 +80,7 @@ class DockerManager < ContainerManager
     end
 
     # Now restart container so it gets port binding env vars
+    parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
     update(guid, parameters)
   end
 
@@ -93,7 +94,6 @@ class DockerManager < ContainerManager
     container.remove(v: true, force: true)
 
     container_create_opts = create_options(guid, parameters)
-    append_port_binding_envvars(guid, container_create_opts)
     Rails.logger.info("+-> Create/update options: #{container_create_opts.inspect}")
     container = Docker::Container.create(container_create_opts)
 
@@ -351,10 +351,8 @@ class DockerManager < ContainerManager
     end.compact
   end
 
-  def append_port_binding_envvars(guid, container_create_opts)
-    envvars = container_create_opts["Env"]
-    envvars = envvars.delete_if { |envvar| envvar =~ /DOCKER_HOST_PORT/ }
-    port_bindings(guid).each do |binding|
+  def append_port_binding_envvars(parameters, port_bindings)
+    port_bindings.each do |binding|
       Rails.logger.info("Update container env var from binding #{binding.inspect}")
       container_port_tcp, host_port_hash = binding
       if container_port_tcp =~ /(\d+)\/tcp/
@@ -362,10 +360,10 @@ class DockerManager < ContainerManager
         host_port = host_port_hash[0]["HostPort"]
       end
       if container_port && host_port
-        envvars << "DOCKER_HOST_PORT_#{container_port}=#{host_port}"
+        parameters["DOCKER_HOST_PORT_#{container_port}"] = host_port
       end
     end
-    container_create_opts["Env"] = envvars
+    parameters
   end
 
   def build_user_envvar(guid)
@@ -466,6 +464,7 @@ class DockerManager < ContainerManager
         image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
         Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
       else
+        Rails.logger.info("No container found for '#{guid}'")
         {}
       end
     else
