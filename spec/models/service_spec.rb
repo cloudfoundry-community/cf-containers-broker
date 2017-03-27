@@ -27,7 +27,6 @@ describe Service do
     'dashboard_client' => {
       'id'           => 'client-id',
       'secret'       => 'client-secret',
-      'redirect_uri' => 'https://broker.10.0.0.1.xip.io/manage/auth/cloudfoundry/callback',
     },
   )
   end
@@ -49,7 +48,7 @@ describe Service do
       expect(service.dashboard_client).to eql({
         'id'           => 'client-id',
         'secret'       => 'client-secret',
-        'redirect_uri' => 'https://broker.10.0.0.1.xip.io/manage/auth/cloudfoundry/callback',
+        'redirect_uri' => 'http://containers.vcap.me/manage/auth/cloudfoundry/callback',
       })
     end
 
@@ -115,7 +114,7 @@ describe Service do
       expect(service_hash.fetch('dashboard_client')).to eq({
         'id'           => 'client-id',
         'secret'       => 'client-secret',
-        'redirect_uri' => 'https://broker.10.0.0.1.xip.io/manage/auth/cloudfoundry/callback',
+        'redirect_uri' => 'http://containers.vcap.me/manage/auth/cloudfoundry/callback',
       })
     end
   end

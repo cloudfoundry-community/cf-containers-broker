@@ -25,6 +25,7 @@ class Service
     @plans       = attrs.fetch('plans')
     @plan_updateable  = attrs.fetch('plan_updateable', true) || true
     @dashboard_client = attrs.fetch('dashboard_client', {}) || {}
+    populate_others
   end
 
   def to_hash
@@ -54,6 +55,14 @@ class Service
 
     unless missing_keys.empty?
       raise Exceptions::ArgumentError, "Missing Service parameters: #{missing_keys.join(', ')}"
+    end
+  end
+
+  def populate_others
+    base_url = Settings.external_host
+    protocol = Settings.ssl_enabled ? 'https' : 'http'
+    unless dashboard_client.empty?
+      dashboard_client['redirect_uri'] = "#{protocol}://#{base_url}/manage/auth/cloudfoundry/callback"
     end
   end
 end
