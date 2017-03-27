@@ -7,13 +7,17 @@ unless Rails.env.assets?
 
   DASHBOARD_CLIENT_PROC = lambda do |env|
     request = Rack::Request.new(env)
-    service = Catalog.find_service_by_guid(request.session[:service_guid])
-    env['omniauth.strategy'].options[:client_id] = service.dashboard_client['id']
-    env['omniauth.strategy'].options[:client_secret] = service.dashboard_client['secret']
-    env['omniauth.strategy'].options[:auth_server_url] = Configuration.auth_server_url
-    env['omniauth.strategy'].options[:token_server_url] = Configuration.token_server_url
-    env['omniauth.strategy'].options[:scope] = %w(cloud_controller_service_permissions.read openid)
-    env['omniauth.strategy'].options[:skip_ssl_validation] = Settings.skip_ssl_validation
+    if service = Catalog.find_service_by_guid(request.session[:service_guid])
+      env['omniauth.strategy'].options[:client_id] = service.dashboard_client['id']
+      env['omniauth.strategy'].options[:client_secret] = service.dashboard_client['secret']
+      env['omniauth.strategy'].options[:auth_server_url] = Configuration.auth_server_url
+      env['omniauth.strategy'].options[:token_server_url] = Configuration.token_server_url
+      env['omniauth.strategy'].options[:scope] = %w(cloud_controller_service_permissions.read openid)
+      env['omniauth.strategy'].options[:skip_ssl_validation] = Settings.skip_ssl_validation
+    else
+      Rails.logger.error("+-> Request for service_guid '#{request.session[:service_guid]}' unknown")
+      raise "Request for service_guid '#{request.session[:service_guid]}' unknown"
+    end
   end
 
   Rails.application.config.middleware.use OmniAuth::Builder do
