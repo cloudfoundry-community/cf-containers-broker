@@ -28,7 +28,7 @@ describe Configuration do
 
   describe '#documentation_url' do
     it 'uses the documentationUrl of the first service in the catalog' do
-      expect(subject.documentation_url).to eql('http://docs.run.pivotal.io')
+      expect(subject.documentation_url).to eql('https://github.com/frodenas/docker-postgresql')
     end
 
     context 'when the catalog is empty' do
@@ -42,7 +42,7 @@ describe Configuration do
 
   describe '#support_url' do
     it 'uses the supportUrl of the first service in the catalog' do
-      expect(subject.support_url).to eql('http://support.run.pivotal.io/home')
+      expect(subject.support_url).to eql('https://slack.cloudfoundry.org')
     end
 
     context 'when the catalog is empty' do
