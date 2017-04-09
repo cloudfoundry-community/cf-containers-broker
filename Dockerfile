@@ -19,7 +19,7 @@ ADD ./config/settings.yml /config/settings.yml
 WORKDIR /app
 
 # Define Rails environment
-ENV RAILS_ENV development
+ENV RAILS_ENV production
 
 # Define Settings file path
 ENV SETTINGS_PATH /config/settings.yml
@@ -36,4 +36,3 @@ EXPOSE 80
 
 # Expose the configuration and logs directories
 VOLUME ["/config", "/app/log"]
-

@@ -4,7 +4,8 @@
 
 defaults: &defaults
   log_path: 'log/<%= Rails.env %>.log'
-  auth_username: 'containers'
+  auth_username: '<%= ENV['BROKER_USERNAME'] || "containers" %>'
+  auth_password: '<%= ENV['BROKER_PASSWORD'] || "secret" %>'
   cookie_secret: 'e7247dae-a252-4393-afa3-2219c1c02efd'
   session_expiry: 86400
 
@@ -71,13 +72,13 @@ defaults: &defaults
               - 'PostgreSQL 9.3 running inside a Docker container'
 
 assets:
-  auth_password: 'secret'
   <<: *defaults
 
 development:
-  auth_password: 'secret'
   <<: *defaults
 
 test:
-  auth_password: 'secret'
+  <<: *defaults
+
+production:
   <<: *defaults
