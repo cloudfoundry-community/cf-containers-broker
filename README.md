@@ -76,8 +76,19 @@ docker run -d --name cf-containers-broker \
        frodenas/cf-containers-broker
 ```
 
-If you want to override the application configuration, create a host directory, create the configuration files,
-and mount the container's directory `/config` into the previous host directory:
+Some aspects of configuration can be overridden with environment variables:
+
+```
+docker run -d --name cf-containers-broker \
+       --publish 80:80 \
+       --volume /var/run:/var/run \
+       -e BROKER_USERNAME=broker \
+       -e BROKER_PASSWORD=password \
+       -e DOCKER_HOST_IP=${DOCKER_HOST_IP:?required} \
+       frodenas/cf-containers-broker
+```
+
+If you want to override the entire configuration, then create a directory with the configuration files, and mount this directory into the container's `/config` directory:
 
 ```
 mkdir -p /tmp/cf-containers-broker/config
@@ -155,7 +166,7 @@ When new images become available or configuration of the plans change it can bec
 
 The mapping between running containers and configured plans is achieved by adding the labels `plan_id` and `instance_id` to the containers at create time. Containers that don't have these labels will be ignored by the update script.
 
-If you are updating cf-containers-broker from an older version that didn't add the required labels you can force the broker to recreate the containers via `cf update-service <service-id>`. After this the labels will be available and the `bin/update_all_containers` script will be able to identify the containers for automatic updating. 
+If you are updating cf-containers-broker from an older version that didn't add the required labels you can force the broker to recreate the containers via `cf update-service <service-id>`. After this the labels will be available and the `bin/update_all_containers` script will be able to identify the containers for automatic updating.
 
 In order for `cf update-service <service-id>` to work the service must declare `plan_updateable: true`.
 
