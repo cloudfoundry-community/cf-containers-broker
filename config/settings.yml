@@ -26,58 +26,34 @@ defaults: &defaults
     id: 'ef761cec-14f7-11e7-8dfb-bbab51a4e12a'
     description: 'PostgreSQL 9.6 service for application development and testing'
     bindable: true
-    tags:
-      - 'postgresql96'
-      - 'postgresql'
-      - 'relational'
+    tags: [postgresql96 postgresql sql relational]
     metadata:
       displayName: 'PostgreSQL 9.6'
-      imageUrl: 'data:image/png;base64,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'
       longDescription: 'A PostgreSQL 9.6 service for development and testing running inside a Docker container'
       providerDisplayName: 'Cloud Foundry Community'
       documentationUrl: 'https://github.com/frodenas/docker-postgresql'
       supportUrl: 'https://slack.cloudfoundry.org'
-    dashboard_client:
-      id: docker-broker-postgresql96
-      secret: docker-broker-postgresql96-secret
     plans:
     - id: 'f30f03fa-14f7-11e7-8d86-cf0d7f2c3728'
       name: 'free'
+      description: 'Free Trial'
       container:
         backend: 'docker'
         image: 'frodenas/postgresql'
         tag: '9.6'
-        persistent_volumes:
-          - '/data'
+        persistent_volumes: [/data]
       credentials:
-        username:
-          key: 'POSTGRES_USERNAME'
-        password:
-          key: 'POSTGRES_PASSWORD'
-        dbname:
-          key: 'POSTGRES_DBNAME'
-        uri:
-          prefix: 'postgres'
-      description: 'Free Trial'
-      metadata:
-        costs:
-          - amount:
-              usd: 0.0
-            unit: 'MONTHLY'
-        bullets:
-          - 'Dedicated PostgreSQL 9.6 server'
-          - 'PostgreSQL 9.6 running inside a Docker container'
+        username: {key: 'POSTGRES_USERNAME'}
+        password: {key: 'POSTGRES_PASSWORD'}
+        dbname: {key: 'POSTGRES_DBNAME'}
+        uri: {prefix: 'postgres'}
   - name: 'redis32'
     id: '0fdcc9c0-14f5-11e7-9d8c-cfde16aa4822'
     description: 'Redis 3.2 service for application development and testing'
     bindable: true
-    tags:
-      - 'redis32'
-      - 'redis'
-      - 'key-value'
+    tags: [redis32, redis, key-value]
     metadata:
       displayName: 'Redis 3.2'
-      imageUrl: 'data:image/png;base64,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'
       longDescription: 'A Redis 2.8 service for development and testing running inside a Docker container'
       providerDisplayName: 'Cloud Foundry Community'
       documentationUrl: 'https://github.com/frodenas/docker-redis'
@@ -85,24 +61,14 @@ defaults: &defaults
     plans:
     - id: '13d21792-14f5-11e7-81cd-4357fa4eeda9'
       name: 'free'
+      description: 'Free Trial'
       container:
         backend: 'docker'
         image: 'frodenas/redis'
         tag: '3.2'
-        persistent_volumes:
-          - '/data'
+        persistent_volumes: [/data]
       credentials:
-        password:
-          key: 'REDIS_PASSWORD'
-      description: 'Free Trial'
-      metadata:
-        costs:
-        - amount:
-            usd: 0.0
-          unit: 'MONTHLY'
-        bullets:
-          - 'Dedicated Redis 3.2 server'
-          - 'Redis 3.2 running inside a Docker container'
+        password: {key: 'REDIS_PASSWORD'}
 
 assets:
   <<: *defaults
