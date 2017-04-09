@@ -1,5 +1,5 @@
-FROM frodenas/ruby
-MAINTAINER Ferran Rodenas <frodenas@gmail.com>
+FROM ruby:2.3.3
+LABEL maintainers Ferran Rodenas <frodenas@gmail.com>, Dr Nic Williams <drnicwilliams@gmail.com>
 
 # Add application code
 ADD . /app
