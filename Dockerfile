@@ -1,4 +1,4 @@
-FROM frodenas/ruby
+FROM ruby:2.3.1
 MAINTAINER Ferran Rodenas <frodenas@gmail.com>
 
 # Add application code
@@ -36,4 +36,3 @@ EXPOSE 80
 
 # Expose the configuration and logs directories
 VOLUME ["/config", "/app/log"]
-

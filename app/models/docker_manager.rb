@@ -255,9 +255,14 @@ class DockerManager < ContainerManager
   end
 
   def validate_docker_remote_api
-    api_version = Docker.version.fetch('ApiVersion', '0')
-    # Swarm returns API version with wrong key APIVersion instead of ApiVersion, so until
-    # https://github.com/docker/swarm/issues/687 is solved and released, work around this
+    api_version = 0
+    begin
+      api_version = Docker.version.fetch('ApiVersion', '0')
+    rescue
+      api_version = 0
+    end
+      # Swarm returns API version with wrong key APIVersion instead of ApiVersion, so until
+      # https://github.com/docker/swarm/issues/687 is solved and released, work around this
     if api_version == '0'
       api_version = Docker.version.fetch('APIVersion', '0')
     end
