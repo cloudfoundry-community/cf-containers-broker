@@ -10,8 +10,8 @@ defaults: &defaults
   session_expiry: 86400
 
   cc_api_uri: 'http://api.vcap.me'
-  external_ip: <%= ENV['DOCKER_HOST_IP'] || "127.0.0.1" %>
-  external_host: <%= ENV['DOCKER_HOST_IP'] || "containers.vcap.me" %>
+  external_ip: <%= ENV['EXTERNAL_IP'] || ENV['EXTERNAL_HOST'] || "127.0.0.1" %>
+  external_host: <%= ENV['EXTERNAL_HOST'] || "containers.vcap.me" %>
 
   ssl_enabled: false
   skip_ssl_validation: true

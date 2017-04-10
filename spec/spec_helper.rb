@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
 # Copyright (c) 2014 Pivotal Software, Inc. All Rights Reserved.
 ENV['RAILS_ENV'] ||= 'test'
-ENV.delete("DOCKER_HOST_IP")
+ENV.delete("EXTERNAL_HOST")
+ENV.delete("EXTERNAL_IP")
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'

@@ -84,7 +84,7 @@ docker run -d --name cf-containers-broker \
        --volume /var/run:/var/run \
        -e BROKER_USERNAME=broker \
        -e BROKER_PASSWORD=password \
-       -e DOCKER_HOST_IP=${DOCKER_HOST_IP:?required} \
+       -e EXTERNAL_HOST=localhost \
        frodenas/cf-containers-broker
 ```
 
