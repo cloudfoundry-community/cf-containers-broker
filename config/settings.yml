@@ -4,13 +4,13 @@
 
 defaults: &defaults
   log_path: 'log/<%= Rails.env %>.log'
-  auth_username: '<%= ENV['BROKER_USERNAME'] || "containers" %>'
-  auth_password: '<%= ENV['BROKER_PASSWORD'] || "secret" %>'
-  cookie_secret: 'e7247dae-a252-4393-afa3-2219c1c02efd'
-  session_expiry: 86400
+  auth_username: <%= ENV['BROKER_USERNAME'] || "containers" %>
+  auth_password: <%= ENV['BROKER_PASSWORD'] || "secret" %>
+  cookie_secret: <%= ENV['COOKIE_SECRET'] || 'e7247dae-a252-4393-afa3-2219c1c02efd' %>
+  session_expiry: <%= ENV['SESSION_EXPIRY'] || 86400 %>
 
   # Restrict a maximum number of service instances/containers; 0 if unlimited
-  max_containers: 0
+  max_containers: <%= ENV['MAX_CONTAINERS'] || 0 %>
 
   # IP/host used as 'host' for binding credentials
   external_ip: <%= ENV['EXTERNAL_IP'] || ENV['EXTERNAL_HOST'] || "127.0.0.1" %>

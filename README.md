@@ -76,7 +76,7 @@ docker run -d --name cf-containers-broker \
        frodenas/cf-containers-broker
 ```
 
-Some aspects of configuration can be overridden with environment variables:
+Some aspects of configuration can be overridden with environment variables. See `config/settings.yml` for documentation and environment variables.
 
 ```
 docker run -d --name cf-containers-broker \
