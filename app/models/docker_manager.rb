@@ -480,8 +480,4 @@ class DockerManager < ContainerManager
 
     policy
   end
-
-  def host_uri
-    Settings.external_ip
-  end
 end
