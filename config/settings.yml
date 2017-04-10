@@ -9,17 +9,30 @@ defaults: &defaults
   cookie_secret: 'e7247dae-a252-4393-afa3-2219c1c02efd'
   session_expiry: 86400
 
-  cc_api_uri: 'http://api.vcap.me'
-  external_ip: <%= ENV['EXTERNAL_IP'] || ENV['EXTERNAL_HOST'] || "127.0.0.1" %>
-  external_host: <%= ENV['EXTERNAL_HOST'] || "containers.vcap.me" %>
+  # Restrict a maximum number of service instances/containers; 0 if unlimited
+  max_containers: 0
 
+  # IP/host used as 'host' for binding credentials
+  external_ip: <%= ENV['EXTERNAL_IP'] || ENV['EXTERNAL_HOST'] || "127.0.0.1" %>
+
+  # Dashboard URL hostname
+  external_host: <%= ENV['EXTERNAL_HOST'] || "containers.vcap.me" %>
+  # Dashboard URL protocol - if ssl_enabled then https:// else http://
   ssl_enabled: false
+
+  cc_api_uri: 'http://api.vcap.me'
   skip_ssl_validation: true
 
+  # Root folder on host machine for all container volumes
   host_directory: '/var/vcap/store/cf-containers-broker/'
-  max_containers: 0
+
+  # Allocates ephemeral ports on host machine for each exposed port in Docker image
   allocate_docker_host_ports: true
-  container_env_var_dir: '/var/vcap/store/cf-containers-broker/envdir'
+
+  # Ability to set environment variables to each container
+  # File "/envdir/FOOBAR" will add an env var $FOOBAR to each Docker container,
+  # set to the value from the file
+  container_env_var_dir: '/envdir'
 
   services:
   - name: 'postgresql96'
