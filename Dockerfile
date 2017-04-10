@@ -35,4 +35,4 @@ CMD ["bundle", "exec", "unicorn", "-c", "/config/unicorn.conf.rb"]
 EXPOSE 80
 
 # Expose the configuration and logs directories
-VOLUME ["/config", "/app/log"]
+VOLUME ["/config", "/app/log", "/envdir"]
