@@ -39,7 +39,7 @@ defaults: &defaults
     id: 'ef761cec-14f7-11e7-8dfb-bbab51a4e12a'
     description: 'PostgreSQL 9.6 service for application development and testing'
     bindable: true
-    tags: [postgresql96 postgresql sql relational]
+    tags: [postgresql96, postgresql, sql, relational]
     metadata:
       displayName: 'PostgreSQL 9.6'
       longDescription: 'A PostgreSQL 9.6 service for development and testing running inside a Docker container'
