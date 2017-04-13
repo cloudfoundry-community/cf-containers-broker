@@ -321,7 +321,7 @@ describe DockerManager do
         'Ulimits' => [],
       }
     }
-    let(:env_vars) { ['USER=MY-USER', "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}", "NAME=#{container_name}"] }
+    let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}"] }
     let(:binds) { [] }
     let(:port_bindings) { { expose_port => [{ 'HostPort' => host_port.to_s }] } }
     let(:persistent_volume) { nil }
@@ -365,7 +365,6 @@ describe DockerManager do
         context 'with a username key' do
           let(:username_key) { 'USERNAME-KEY' }
           let(:env_vars) { ['USER=MY-USER',
-            "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}",
             "#{username_key}=#{username_value}",
             "NAME=#{container_name}"] }
 
@@ -377,7 +376,6 @@ describe DockerManager do
         context 'with a password key' do
           let(:password_key) { 'PASSWORD-KEY' }
           let(:env_vars) { ['USER=MY-USER',
-            "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}",
             "#{password_key}=#{password_value}",
             "NAME=#{container_name}"] }
 
@@ -389,7 +387,6 @@ describe DockerManager do
         context 'with a dbname key' do
           let(:dbname_key) { 'DBNAME-KEY' }
           let(:env_vars) { ['USER=MY-USER',
-            "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}",
             "#{dbname_key}=#{dbname_value}",
             "NAME=#{container_name}"] }
 
@@ -406,7 +403,7 @@ describe DockerManager do
 
         it 'should expose the container image exposed ports' do
           expect(Docker::Container).to receive(:create).with(container_create_opts).and_return(container)
-          expect(Docker::Container).to receive(:get).with(container_name).twice.and_return(container)
+          expect(Docker::Container).to receive(:get).with(container_name).and_return(container)
           expect(container).to receive(:json).at_least(2).and_return(container_state)
           expect(container).to receive(:start).with(container_start_opts)
           subject.create(guid)
@@ -465,7 +462,8 @@ describe DockerManager do
         let(:env_vars) { ['USER=MY-USER', "NAME=#{container_name}"] }
 
         before do
-          expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false).twice
+          expect(Settings).to receive(:[]).with('allocate_docker_host_ports').and_return(false)
+          expect(Settings).to receive(:[]).with('enable_host_port_envvar').and_return(nil)
         end
 
         it 'should not add host port bindings when starting a container' do
@@ -479,7 +477,6 @@ describe DockerManager do
       context 'when there are container env vars in files' do
         let(:tmp_envdir) { "/tmp/container_env_var_dir" }
         let(:env_vars) { ['USER=MY-USER',
-          "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}",
           "NAME=#{container_name}",
           'lower_case=lower-value',
           'UPPER_CASE=1234'] }
@@ -517,7 +514,6 @@ describe DockerManager do
       context 'when there are service arbitrary parameters' do
         let(:parameters) { { 'foo' => 'bar', 'bar' => 'foo' } }
         let(:env_vars) { ['USER=MY-USER',
-          "DOCKER_HOST_PORT_#{exposed_container_port}=#{host_port}",
           "NAME=#{container_name}",
           'foo=bar', 'bar=foo'] }
 

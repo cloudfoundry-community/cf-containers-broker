@@ -160,7 +160,7 @@ For more details, see the [CREDENTIALS.md](https://github.com/cloudfoundry-commu
 
 #### Self-discovery of host port bindings
 
-As a bonus, each exposed host port for an instantiated container will passed into the container via environment variables.
+Optionally, each exposed host port for an instantiated container will passed into the container via environment variables, if you enable the `enable_host_port_envvar: true` setting.
 
 If a Docker image exposes an internal port `5432`, then each instantiated container will be provided a `DOCKER_HOST_PORT_5432` environment variable containing the host's port allocation.
 
@@ -169,7 +169,7 @@ Implementation detail: In order to support this feature, provisioning new Docker
 1. Instantiate a Docker container and allow Docker to allocate host ports.
 2. Restart the Docker container with the additional `DOCKER_HOST_PORT_nnnn` environment variables.
 
-If you wish to disable this feature, provide `disable_host_port_envvar: true` in `config/settings.yml`.
+If you wish to enable this feature, provide `enable_host_port_envvar: true` in `config/settings.yml`.
 
 ### Updating Containers
 

@@ -79,9 +79,11 @@ class DockerManager < ContainerManager
       raise Exceptions::BackendError, "Cannot start Docker container `#{container_name(guid)}'"
     end
 
-    # Now restart container so it gets port binding env vars
-    parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
-    update(guid, parameters)
+    if Settings["enable_host_port_envvar"]
+      # Now restart container so it gets port binding env vars
+      parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
+      update(guid, parameters)
+    end
   end
 
   def update(guid, parameters = {})
