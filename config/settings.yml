@@ -29,6 +29,12 @@ defaults: &defaults
   # Allocates ephemeral ports on host machine for each exposed port in Docker image
   allocate_docker_host_ports: true
 
+  # By default, provisioning services with `allocate_docker_host_ports: true`
+  # will create the container and then recreate the container with an additional
+  # DOCKER_HOST_PORT_nnnn environment variable for each exposed port.
+  # If you wish to disable this two-step provisioning process, set to true:
+  disable_host_port_envvar: false
+
   # Ability to set environment variables to each container
   # File "/envdir/FOOBAR" will add an env var $FOOBAR to each Docker container,
   # set to the value from the file
