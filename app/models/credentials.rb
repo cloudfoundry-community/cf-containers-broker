@@ -64,7 +64,10 @@ class Credentials
   end
 
   def to_hash(guid, hostname, ports)
-    service_credentials = { 'hostname' => hostname }
+    service_credentials = {
+      'hostname' => hostname,
+      'host' => hostname
+    }
     service_credentials['hostname'] = hostname_value if hostname_key
 
     service_credentials['ports'] = ports unless ports.empty?

@@ -165,6 +165,7 @@ describe Credentials do
 
     it 'contains the correct values' do
       expect(credentials_hash.fetch('hostname')).to eq(hostname)
+      expect(credentials_hash.fetch('host')).to eq(hostname)
       expect(credentials_hash.fetch('port')).to eq(host_port)
       expect(credentials_hash.fetch('ports')).to eq(ports)
       expect(credentials_hash.fetch('username')).to eq(username_value)
