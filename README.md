@@ -158,6 +158,19 @@ host machine `10.11.12.13` because the `credentials.uri.port` property was set t
 
 For more details, see the [CREDENTIALS.md](https://github.com/cloudfoundry-community/cf-containers-broker/blob/master/CREDENTIALS.md) file.
 
+#### Self-discovery of host port bindings
+
+Optionally, each exposed host port for an instantiated container will passed into the container via environment variables, if you enable the `enable_host_port_envvar: true` setting.
+
+If a Docker image exposes an internal port `5432`, then each instantiated container will be provided a `DOCKER_HOST_PORT_5432` environment variable containing the host's port allocation.
+
+Implementation detail: In order to support this feature, provisioning new Docker containers requires two steps:
+
+1. Instantiate a Docker container and allow Docker to allocate host ports.
+2. Restart the Docker container with the additional `DOCKER_HOST_PORT_nnnn` environment variables.
+
+If you wish to enable this feature, provide `enable_host_port_envvar: true` in `config/settings.yml`.
+
 ### Updating Containers
 
 When new images become available or configuration of the plans change it can become desirable to restart the running containers to pick up the latest version of their image and/or update their configuration.

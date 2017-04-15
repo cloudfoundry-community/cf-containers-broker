@@ -78,6 +78,12 @@ class DockerManager < ContainerManager
       destroy_volumes(guid)
       raise Exceptions::BackendError, "Cannot start Docker container `#{container_name(guid)}'"
     end
+
+    if Settings["enable_host_port_envvar"]
+      # Now restart container so it gets port binding env vars
+      parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
+      update(guid, parameters)
+    end
   end
 
   def update(guid, parameters = {})
@@ -347,6 +353,21 @@ class DockerManager < ContainerManager
     end.compact
   end
 
+  def append_port_binding_envvars(parameters, port_bindings)
+    port_bindings.each do |binding|
+      Rails.logger.info("Update container env var from binding #{binding.inspect}")
+      container_port_tcp, host_port_hash = binding
+      if container_port_tcp =~ /(\d+)\/tcp/
+        container_port = $1
+        host_port = host_port_hash[0]["HostPort"]
+      end
+      if container_port && host_port
+        parameters["DOCKER_HOST_PORT_#{container_port}"] = host_port
+      end
+    end
+    parameters
+  end
+
   def build_user_envvar(guid)
     if username_key = credentials.username_key
       "#{username_key}=#{credentials.username_value(guid)}"
@@ -441,9 +462,13 @@ class DockerManager < ContainerManager
 
   def port_bindings(guid)
     if expose_ports.empty?
-      container = find(guid)
-      image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
-      Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
+      if container = find(guid)
+        image_expose_ports = container.json.fetch('Config', {}).fetch('ExposedPorts', {})
+        Hash[image_expose_ports.map { |ep, _| [ep, [ host_port_binding(ep) ]] }]
+      else
+        Rails.logger.info("No container found for '#{guid}'")
+        {}
+      end
     else
       Hash[expose_ports.map { |ep| [ep, [ host_port_binding(ep) ]] }]
     end
@@ -451,6 +476,7 @@ class DockerManager < ContainerManager
 
   def host_port_binding(port)
     return {} unless Settings['allocate_docker_host_ports']
+    return {} unless port
 
     p = port.split('/')
     protocol = p.last || 'tcp'
