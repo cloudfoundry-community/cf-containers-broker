@@ -75,7 +75,7 @@ defaults: &defaults
     tags: [redis32, redis, key-value]
     metadata:
       displayName: 'Redis 3.2'
-      longDescription: 'A Redis 2.8 service for development and testing running inside a Docker container'
+      longDescription: 'A Redis 3.2 service for development and testing running inside a Docker container'
       providerDisplayName: 'Cloud Foundry Community'
       documentationUrl: 'https://github.com/frodenas/docker-redis'
       supportUrl: 'https://slack.cloudfoundry.org'
