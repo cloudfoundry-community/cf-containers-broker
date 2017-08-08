@@ -29,7 +29,7 @@ class Service
   end
 
   def to_hash
-    {
+    rv = {
       'id'               => id,
       'name'             => name,
       'description'      => description,
@@ -39,8 +39,14 @@ class Service
       'requires'         => requires,
       'plans'            => plans.map(&:to_hash),
       'plan_updateable'  => plan_updateable,
-      'dashboard_client' => dashboard_client,
     }
+
+    # Do not return even a empty map unless we have a value
+    # (else subway deserialization/serialization will add them it)
+    unless dashboard_client.empty?
+          rv['dashboard_client'] = dashboard_client
+    end
+    rv
   end
 
   private

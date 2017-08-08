@@ -119,3 +119,33 @@ describe Service do
     end
   end
 end
+
+describe Service do
+  let(:subject) { described_class }
+  let(:plan) { double('Plan', to_hash: 'plan-hash') }
+  let(:service) do
+    described_class.build(
+    'id'               => 'service_id',
+    'name'             => 'service_name',
+    'description'      => 'service_description',
+    'bindable'         => false,
+    'plans'            => [
+      double('Plan')
+    ],
+    'plan_updateable'  => true,
+  )
+  end
+
+  before do
+    allow(Plan).to receive(:build).and_return(plan)
+  end
+
+  describe '#to_hash' do
+    it 'contains the correct values' do
+      service_hash = service.to_hash
+
+      expect(service_hash.fetch('id')).to eq('service_id')
+      expect(service_hash.has_value?('dashboard_client')).to eq(false)
+    end
+  end
+end
