@@ -16,7 +16,7 @@ and bind applications to the service. The management tasks that the broker can p
  * Unprovision a service container
  * Expose a service container management dashboard
 
-More details can be found at this [Pivotal P.O.V Blog post](http://blog.pivotal.io/cloud-foundry-pivotal/products/docker-service-broker-for-cloud-foundry).
+More details can be found at this [Pivotal P.O.V Blog post](https://content.pivotal.io/blog/docker-service-broker-for-cloud-foundry).
 
 ## Disclaimer
 
