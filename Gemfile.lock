@@ -197,6 +197,8 @@ GEM
     tilt (2.0.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    tzinfo-data (1.2017.3)
+      tzinfo (>= 1.0.0)
     unicorn (5.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -220,8 +222,9 @@ DEPENDENCIES
   sass-rails
   settingslogic
   shotgun
+  tzinfo-data
   unicorn
   webmock
 
 BUNDLED WITH
-   1.14.3
+   1.14.6

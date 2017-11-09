@@ -7,7 +7,7 @@ gem 'omniauth-uaa-oauth2', git: 'https://github.com/cloudfoundry/omniauth-uaa-oa
 gem 'nats'
 gem 'sass-rails'
 gem 'docker-api'
-
+gem 'tzinfo-data'
 
 group :production do
   gem 'unicorn'
