@@ -5,8 +5,9 @@ branches:
     - master
 
 rvm:
-  - 2.2.0
-  - 2.3.3
+  - 2.2
+  - 2.3
+  - 2.4
 
 bundler_args: --deployment --without development
 

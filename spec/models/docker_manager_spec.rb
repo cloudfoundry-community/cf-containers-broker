@@ -478,8 +478,8 @@ describe DockerManager do
         let(:tmp_envdir) { "/tmp/container_env_var_dir" }
         let(:env_vars) { ['USER=MY-USER',
           "NAME=#{container_name}",
-          'lower_case=lower-value',
-          'UPPER_CASE=1234'] }
+          'UPPER_CASE=1234',
+          'lower_case=lower-value'] }
 
         before do
           FileUtils.rm_rf(tmp_envdir)
