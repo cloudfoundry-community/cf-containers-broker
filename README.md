@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cf-platform-eng/cf-containers-broker.png?branch=master)](https://travis-ci.org/cf-platform-eng/cf-containers-broker)
+[![Known Vulnerabilities](https://snyk.io/test/github/cloudfoundry-community/cf-containers-broker/badge.svg)](https://snyk.io/test/github/cloudfoundry-community/cf-containers-broker)
 
 # Containers Service Broker for Cloud Foundry
 
