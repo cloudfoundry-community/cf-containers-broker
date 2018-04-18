@@ -84,6 +84,8 @@ class DockerManager < ContainerManager
       parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
       update(guid, parameters)
     end
+
+    get_account(guid)
   end
 
   def update(guid, parameters = {})
@@ -149,6 +151,14 @@ class DockerManager < ContainerManager
       service_credentials
     else
       raise Exceptions::NotFound, "Docker Container `#{container_name(guid)}' not found"
+    end
+  end
+
+  def get_account(guid)
+    Rails.logger.info("get account info")
+    if container = find(guid)
+      result = container.exec("geth --datadir /root/datadir/ account list 2>/dev/null | grep Account | cut -d" " -f 4 | cut -c 12- | xargs cat")
+      Rails.logger.info("result #{result}")
     end
   end
 
@@ -305,7 +315,6 @@ class DockerManager < ContainerManager
       'Volumes' => {},
       'WorkingDir' => workdir,
       'NetworkDisabled' => false,
-      'ExposedPorts' => {},
       'HostConfig' => {
         'Binds' => volume_bindings(guid),
         'Memory' => convert_memory(memory),
@@ -480,6 +489,9 @@ class DockerManager < ContainerManager
 
     p = port.split('/')
     protocol = p.last || 'tcp'
+    if p.first == "8545" then
+      return { 'HostPort' => "8545" }
+    end
     return { 'HostPort' => host_port_allocator.allocate_host_port(protocol).to_s }
   end
 
