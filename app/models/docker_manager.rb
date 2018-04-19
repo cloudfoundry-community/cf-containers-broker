@@ -84,8 +84,6 @@ class DockerManager < ContainerManager
       parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
       update(guid, parameters)
     end
-
-    get_account(guid)
   end
 
   def update(guid, parameters = {})

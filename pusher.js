@@ -15,6 +15,7 @@ const password = flags.password
 const provider = flags.provider
 const contractPath = args.contract
 
+result = {}
 const Web3 = require('web3')
 if (typeof web3 !== 'undefined') {
   web3 = new Web3(web3.currentProvider);
@@ -51,13 +52,15 @@ fs.readFile(contractPath, {encoding: 'utf-8'}, function(err,data){
 function runDeployment(contract){
   web3.eth.personal.getAccounts()
   .then(data => {
-    console.log("using account " + address)
+//    console.log("using account " + address)
+    result["address"] = address
     return web3.eth.personal.unlockAccount(address, '')
   })
   .then(() => {
-    console.log("unlocked account. estimating gas...");
+//    console.log("unlocked account. estimating gas...");
     var contractAbi = contract.interface
-    console.log("> ABI: " + contractAbi)
+ //   console.log("> ABI: " + contractAbi)
+    result["abi"] = contractAbi
     var contractInterface = new web3.eth.Contract(JSON.parse(contractAbi))
     var compiled = "0x" + contract.bytecode
     deploy = contractInterface.deploy({
@@ -67,18 +70,21 @@ function runDeployment(contract){
     return deploy.estimateGas({from: address})
   })
   .then(gasEstimate => {
-    console.log("gasEstimate = " + gasEstimate + ", now deploying...");
+//    console.log("gasEstimate = " + gasEstimate + ", now deploying...");
     return deploy.send({
       from: address,
       gas: gasEstimate,
       gasLimit: 4000000
     })
     .once('transactionHash', hash => {
-      console.log("transaction hash: " + hash);
+ //     console.log("transaction hash: " + hash);
+      result['transaction_hash'] = hash
       web3.eth.getTransaction(hash)
-      .then(transaction => console.log("gasPrice was: " + transaction.gasPrice));
+      .then(transaction => result['gas_price'] = transaction.gasPrice); //console.log("gasPrice was: " + transaction.gasPrice));
+      web3.eth.getTransactionReceipt(hash)
+      .then(transactionReceipt => result['contract_address'] = transactionReceipt.contractAddress); //console.log("contract address: " + transactionReceipt.contractAddress));
     })
   })
-  .then(() => console.log("done"))
+  .then(() => console.log(result))
   .catch(err => console.log(err.stack))
 }

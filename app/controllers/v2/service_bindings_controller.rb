@@ -36,7 +36,7 @@ class V2::ServiceBindingsController < V2::BaseController
         account = plan.container_manager.get_account(instance_guid)
         Rails.logger.info("got account: #{account}")
 
-        cmd = "node /var/vcap/packages/cf-containers-broker/pusher.js -p http://localhost:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
+        cmd = "NODE_PATH=/home/vcap/node_modules node /var/vcap/packages/cf-containers-broker/pusher.js -p http://localhost:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
         Rails.logger.info("contract to apply to geth node: #{cmd}")
         output = `#{cmd}`
         Rails.logger.info("applied contract to geth node: #{output}")
