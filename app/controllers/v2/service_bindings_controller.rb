@@ -22,6 +22,7 @@ class V2::ServiceBindingsController < V2::BaseController
           response['syslog_drain_url'] = syslog_drain_url
         end
         Rails.logger.info("response to grab from: #{response}")
+        host = response['credentials']['host']
         node_port = response['credentials']['ports']['8545/tcp']
         require 'json'
         unpacked = parameters.unpack('m')
@@ -36,10 +37,11 @@ class V2::ServiceBindingsController < V2::BaseController
         account = plan.container_manager.get_account(instance_guid)
         Rails.logger.info("got account: #{account}")
 
-        cmd = "NODE_PATH=/home/vcap/node_modules node /var/vcap/packages/cf-containers-broker/pusher.js -p http://localhost:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
+        cmd = "NODE_PATH=/home/vcap/node_modules node /var/vcap/packages/cf-containers-broker/pusher.js -p http://#{host}:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
         Rails.logger.info("contract to apply to geth node: #{cmd}")
         output = `#{cmd}`
-        Rails.logger.info("applied contract to geth node: #{output}")
+        cleaned = eval(output.gsub(/\n/, ''))
+        response['credentials']['eth_node'] = cleaned
 
         render status: 201, json: response
       else

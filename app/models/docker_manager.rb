@@ -490,9 +490,6 @@ class DockerManager < ContainerManager
 
     p = port.split('/')
     protocol = p.last || 'tcp'
-    if p.first == "8545" then
-      return { 'HostPort' => "8545" }
-    end
     return { 'HostPort' => host_port_allocator.allocate_host_port(protocol).to_s }
   end
 
