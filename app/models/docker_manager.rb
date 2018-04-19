@@ -84,8 +84,6 @@ class DockerManager < ContainerManager
       parameters = append_port_binding_envvars(parameters, container_start_opts["PortBindings"])
       update(guid, parameters)
     end
-
-    get_account(guid)
   end
 
   def update(guid, parameters = {})
@@ -157,8 +155,11 @@ class DockerManager < ContainerManager
   def get_account(guid)
     Rails.logger.info("get account info")
     if container = find(guid)
-      result = container.exec("geth --datadir /root/datadir/ account list 2>/dev/null | grep Account | cut -d" " -f 4 | cut -c 12- | xargs cat")
+      result = container.exec(["geth", "--datadir", "/root/datadir/", "account", "list"])
       Rails.logger.info("result #{result}")
+      parsedResult = result[0][0].scan(/{(\w+)}/).last.first
+      Rails.logger.info("parsedResult #{parsedResult}")
+      parsedResult
     end
   end
 
