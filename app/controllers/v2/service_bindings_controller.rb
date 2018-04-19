@@ -21,18 +21,23 @@ class V2::ServiceBindingsController < V2::BaseController
         if syslog_drain_url = plan.container_manager.syslog_drain_url(instance_guid)
           response['syslog_drain_url'] = syslog_drain_url
         end
+        Rails.logger.info("response to grab from: #{response}")
         node_port = response['credentials']['ports']['8545/tcp']
-        hostname = response ['credentials']['hostname']
         require 'json'
         unpacked = parameters.unpack('m')
         parsedParameters = JSON.parse(unpacked[0])
         Rails.logger.info("got params: #{parsedParameters}")
-       
-        getContract = "wget #{parsedParameters{"contract_url"}} -O /var/vcap/packages/cf-containers-broker/simple.sol"
+
+        getContract = "wget #{parsedParameters["contract_url"]} -O /tmp/simple.sol 2>&1"
+        Rails.logger.info("contract to get: #{getContract}")
         output = `#{getContract}`
         Rails.logger.info("got contract: #{output}")
 
-        cmd = "node /var/vcap/packages/cf-containers-broker/pusher.js -p #{hostname}:#{node_port} -a address -x /var/vcap/packages/cf-containers-broker/simple.sol"
+        account = plan.container_manager.get_account(instance_guid)
+        Rails.logger.info("got account: #{account}")
+
+        cmd = "node /var/vcap/packages/cf-containers-broker/pusher.js -p http://localhost:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
+        Rails.logger.info("contract to apply to geth node: #{cmd}")
         output = `#{cmd}`
         Rails.logger.info("applied contract to geth node: #{output}")
 
