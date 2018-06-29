@@ -5,7 +5,7 @@ gem 'rails-api'
 gem 'settingslogic'
 gem 'omniauth-uaa-oauth2', git: 'https://github.com/cloudfoundry/omniauth-uaa-oauth2'
 gem 'nats'
-gem 'sass-rails'
+gem 'sass-rails', '>= 5.0.7'
 gem 'docker-api'
 gem 'tzinfo-data'
 
@@ -19,7 +19,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'guard-rails'
+  gem 'guard-rails', '>= 0.8.1'
   gem 'shotgun'
 end
 
