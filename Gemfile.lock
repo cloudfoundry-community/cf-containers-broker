@@ -218,14 +218,14 @@ PLATFORMS
 
 DEPENDENCIES
   docker-api
-  guard-rails
+  guard-rails (>= 0.8.1)
   lograge
   nats
   omniauth-uaa-oauth2!
   rails (~> 4)
   rails-api
   rspec-rails
-  sass-rails
+  sass-rails (>= 5.0.7)
   settingslogic
   shotgun
   tzinfo-data
