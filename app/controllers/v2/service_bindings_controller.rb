@@ -36,8 +36,9 @@ class V2::ServiceBindingsController < V2::BaseController
 
         account = plan.container_manager.get_account(instance_guid)
         Rails.logger.info("got account: #{account}")
-
-        cmd = "node /var/vcap/packages/cf-containers-broker/pusher.js -p http://#{host}:#{node_port} -a #{account} -x foo /tmp/simple.sol 2>&1"
+        cmd = "solc --combined-json abi,bin /tmp/simple.sol > /tmp/simple.bin"
+        output = `#{cmd}`
+        cmd = "node /var/vcap/packages/cf-containers-broker/pusher.js -p http://#{host}:#{node_port} -a #{account} -x foo /tmp/simple.bin 2>&1"
         Rails.logger.info("contract to apply to geth node: #{cmd}")
         output = `#{cmd}`
         cleaned = eval(output.gsub(/\n/, ''))

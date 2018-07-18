@@ -38,8 +38,7 @@ if (!fs.existsSync(contractPath)) {
 
 fs.readFile(contractPath, {encoding: 'utf-8'}, function(err,data){
     if (!err) {
-      var solc = require('solc')
-      var output = solc.compile(data, 1)
+      var output = JSON.parse(data)
       for(var contractName in output.contracts){
         runDeployment(output.contracts[contractName])
       }
@@ -58,11 +57,11 @@ function runDeployment(contract){
   })
   .then(() => {
 //    console.log("unlocked account. estimating gas...");
-    var contractAbi = contract.interface
+    var contractAbi = contract.abi
  //   console.log("> ABI: " + contractAbi)
     result["abi"] = contractAbi
     var contractInterface = new web3.eth.Contract(JSON.parse(contractAbi))
-    var compiled = "0x" + contract.bytecode
+    var compiled = "0x" + contract.bin
     deploy = contractInterface.deploy({
       data: compiled,
       arguments: [123]
