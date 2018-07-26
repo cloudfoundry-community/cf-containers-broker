@@ -3,7 +3,8 @@ const {flags, args} = CLI.parse({
   flags: {
     'address': CLI.flags.string({char: 'a'}),
     'password': CLI.flags.string({char: 'x'}),
-    'provider': CLI.flags.string({char: 'p'})
+    'provider': CLI.flags.string({char: 'p'}),
+    'constructorArgs': CLI.flags.string({char: 'c'})
   },
   args: [
     {name: 'contract', required: true}
@@ -13,7 +14,10 @@ const {flags, args} = CLI.parse({
 const address = flags.address
 const password = flags.password
 const provider = flags.provider
+const cArgs = JSON.parse(flags.constructorArgs)
 const contractPath = args.contract
+
+
 
 result = {}
 const Web3 = require('web3')
@@ -23,6 +27,12 @@ if (typeof web3 !== 'undefined') {
   // set the provider you want from Web3.providers
   web3 = new Web3(new Web3.providers.HttpProvider(provider));
 }
+
+convertedArgs = []
+cArgs.forEach(function(arg){
+  convertedArgs.push(web3.utils.asciiToHex(arg));
+});
+const constructorArgs = convertedArgs
 
 
 if (provider == "") {
@@ -64,7 +74,7 @@ function runDeployment(contract){
     var compiled = "0x" + contract.bin
     deploy = contractInterface.deploy({
       data: compiled,
-      arguments: [123]
+      arguments: constructorArgs
     });
     return deploy.estimateGas({from: address})
   })
