@@ -152,6 +152,17 @@ class DockerManager < ContainerManager
     end
   end
 
+  def get_account(guid)
+    Rails.logger.info("get account info")
+    if container = find(guid)
+      result = container.exec(["geth", "--datadir", "/root/datadir/", "account", "list"])
+      Rails.logger.info("result #{result}")
+      parsedResult = result[0][0].scan(/{(\w+)}/).last.first
+      Rails.logger.info("parsedResult #{parsedResult}")
+      parsedResult
+    end
+  end
+
   def syslog_drain_url(guid)
     return nil unless syslog_drain_port
 
@@ -305,7 +316,6 @@ class DockerManager < ContainerManager
       'Volumes' => {},
       'WorkingDir' => workdir,
       'NetworkDisabled' => false,
-      'ExposedPorts' => {},
       'HostConfig' => {
         'Binds' => volume_bindings(guid),
         'Memory' => convert_memory(memory),
