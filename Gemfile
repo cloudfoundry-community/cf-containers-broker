@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4'
+gem 'rails', '~> 4', '>= 4.2.11'
 gem 'rails-api'
 gem 'settingslogic'
 gem 'omniauth-uaa-oauth2', git: 'https://github.com/cloudfoundry/omniauth-uaa-oauth2'
