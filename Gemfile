@@ -5,7 +5,7 @@ gem 'rails-api'
 gem 'settingslogic'
 gem 'omniauth-uaa-oauth2'
 gem 'nats'
-gem 'sass-rails'
+gem 'sass-rails', '>= 6.0.0'
 gem 'docker-api'
 gem 'tzinfo-data'
 
