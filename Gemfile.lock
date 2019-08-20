@@ -219,7 +219,7 @@ DEPENDENCIES
   rails (~> 4)
   rails-api
   rspec-rails
-  sass-rails
+  sass-rails (>= 6.0.0)
   settingslogic
   shotgun
   tzinfo-data
@@ -227,4 +227,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
