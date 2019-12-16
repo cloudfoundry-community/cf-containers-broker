@@ -53,7 +53,7 @@ GEM
       multi_json
     erubis (2.7.0)
     eventmachine (1.2.7)
-    excon (0.66.0)
+    excon (0.71.0)
     ffi (1.11.1)
     formatador (0.2.5)
     globalid (0.4.2)
