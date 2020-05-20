@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 
 ruby '~> 2.5.5'
 
-gem 'rails', '~> 4'
-gem 'rails-api'
+gem 'rails', '~> 5', '>= 5.2.4.3'
+gem 'rails-api', '>= 0.4.1'
 gem 'settingslogic'
 gem 'omniauth-uaa-oauth2'
 gem 'nats'
@@ -13,11 +13,11 @@ gem 'tzinfo-data'
 
 group :production do
   gem 'unicorn'
-  gem 'lograge'
+  gem 'lograge', '>= 0.11.2'
 end
 
 group :development, :test do
-  gem 'rspec-rails'
+  gem 'rspec-rails', '>= 3.8.2'
 end
 
 group :development do
