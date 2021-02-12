@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 ruby '~> 2.5.5'
 
-gem 'rails', '~> 4'
+gem 'rails', '~> 6', '>= 6.0.3.5'
 gem 'rails-api'
 gem 'settingslogic'
 gem 'omniauth-uaa-oauth2'
